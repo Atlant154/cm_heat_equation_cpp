@@ -7,6 +7,8 @@ tridiagonal_matrix::tridiagonal_matrix(const unsigned int h_num, const unsigned 
 	set_above();
 	set_main();
 	set_below();
+	
+	set_a(0.022);
 };
 
 long double tridiagonal_matrix::get_h() {
@@ -21,25 +23,41 @@ void tridiagonal_matrix::set_tau(const unsigned int time_layers_num) {
 	tau = (TIME_RIGHT_BOUND - TIME_LEFT_BOUND) / time_layers_num;
 };
 
+void set_a(long double alpha) {
+	a = alpha;
+};
+
 void tridiagonal_matrix::set_above() {
 	above.reserve(n-1);
-	for(int i=0; i < n-1; ++i) {
-		above[i] = i;
-	}
 };
 
 void tridiagonal_matrix::set_main() {
 	main.reserve(n);
-		for(int i=0; i < n; ++i) {
-		main[i] = 2*i*i;
 	}		
 };
 	
 void tridiagonal_matrix::set_below() {
-	below.reserve(n-1);
-	for(int i=0; i < n-1; ++i) {
-		below[i] = i;
-	}		
+	below.reserve(n-1);	
+};
+
+long double f(long double x, long double t) {
+	return 1;
+};
+
+long double u(long double x, long double t) {
+	return 1;
+};
+
+long double mu_0(long double x) {
+	return 1;
+}
+
+long double mu_1(long double t) {
+	return 1;
+};
+	
+long double mu_2(long double t) {
+	return 1;
 };
 
 std::vector<long double> tridiagonal_matrix::TDMA() {
