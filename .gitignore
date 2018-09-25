@@ -8,3 +8,7 @@ install_manifest.txt
 \.idea/
 
 cmake-build-debug/
+
+venv/
+
+result/

@@ -3,7 +3,9 @@
 
 #include "../include/tridiagonal_matrix.h"
 
+#define RESULT_PATH "../result/result.txt"
 
+void write_to_file(long double results[], long unsigned int h_num, long unsigned int time_layers_num);
 
 int main(){
     long unsigned int h_num = 0;
@@ -20,10 +22,33 @@ int main(){
         if(time_layers_num > 0)
             break;
     }
+    //Test data:
+    long double test_array[9] = {0.0, 1.0, 2.3, 1.2, 1.2, 3.1,4.2, 4.1, 4.3};
+    write_to_file(test_array, h_num, time_layers_num);
     /* TODO make calculation great again */
-    std::ofstream result_file;
-    result_file.open("../result/result.txt", std::ios::out | std::ios::trunc);
-    /*TODO make result writing great again */
-    result_file.close();
     return 0;
+}
+
+void write_to_file(long double results[], long unsigned int h_num, long unsigned int time_layers_num)
+{
+    std::ofstream result_file;
+    result_file.open(RESULT_PATH, std::ios::out | std::ios::trunc);
+    /*TODO fix the getting bounds: */
+    result_file << "[[" << 0 << ", " << 1 << ", " << (double)1/h_num << "],"
+    << "[" << 0 << ", " << 1 << ", " << (double)1/time_layers_num << "],";
+    for(long unsigned int time_iter = 0; time_iter < time_layers_num; ++time_iter)
+    {
+        result_file << "[";
+        for(long unsigned int h_iter = 0; h_iter < h_num; ++h_iter) {
+            result_file << results[time_iter * time_layers_num + h_iter];
+            std::cout << "H iter: " << h_iter << ". H num: " << h_num << "." << std::endl;
+            if(h_iter + 1 != h_num)
+                result_file << ",";
+        }
+        result_file << "]";
+        if(time_iter + 1 != time_layers_num)
+            result_file << ",";
+    }
+    result_file << "]";
+    result_file.close();
 }
