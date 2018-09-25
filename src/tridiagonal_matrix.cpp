@@ -60,7 +60,7 @@ std::vector<long double> tridiagonal_matrix::TDMA() {
 	
 	p[n-1] = g[n-1];
 	for(unsigned int j = n-1; j > 0; --j) {
-		p[i-1] = g[i-1] - w[i-1]*p[i]
+		p[j-1] = g[j-1] - w[j-1]*p[j];
 	}
 	return p;
 };
