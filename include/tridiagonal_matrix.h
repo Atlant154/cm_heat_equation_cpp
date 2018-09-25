@@ -15,6 +15,8 @@ public:
 	tridiagonal_matrix(const unsigned int h_num, const unsigned int time_layers_num);
 	
 	long double get_h();
+	
+	std::vector<long double> TDMA();
 private:
 	void set_h(const unsigned int h_num);
 	

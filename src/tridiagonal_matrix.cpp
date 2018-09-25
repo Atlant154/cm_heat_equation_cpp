@@ -41,3 +41,26 @@ void tridiagonal_matrix::set_below() {
 		below[i] = i;
 	}		
 };
+
+std::vector<long double> tridiagonal_matrix::TDMA() {
+	std::vector<long double> w;
+	w.reserve(n-1);
+	std::vector<long double> g;
+	g.reserve(n);
+	std::vector<long double> p;
+	p.reserve(n);
+	w[0] = below[0]/main[0];
+	g[0] = free[0]/main[0];
+	
+	for(unsigned int i = 1; i < n-1; ++i) {
+		w[i] = below[i]/(main[i] - above[i-1]*w[i-1]);
+		g[i] = (free[i] - above[i-1]*g[i-1])/(main[i] - above[i-1]*w[i-1]);
+	}
+	g[n-1] = (free[n-1] - above[n-2]*g[n-2])/(main[n-1] - above[n-2]*w[n-2]);
+	
+	p[n-1] = g[n-1];
+	for(unsigned int j = n-1; j > 0; --j) {
+		p[i-1] = g[i-1] - w[i-1]*p[i]
+	}
+	return p;
+};
