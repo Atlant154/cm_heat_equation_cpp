@@ -9,56 +9,55 @@ tridiagonal_matrix::tridiagonal_matrix(const unsigned int h_num, const unsigned 
 	set_below();
 	
 	set_a(0.022);
-};
+}
 
 long double tridiagonal_matrix::get_h() {
 	return h;
-};
+}
 
 void tridiagonal_matrix::set_h(const unsigned int h_num) {
 	h = (X_RIGHT_BOUND - X_LEFT_BOUND) / h_num;
-};
+}
 
 void tridiagonal_matrix::set_tau(const unsigned int time_layers_num) {
 	tau = (TIME_RIGHT_BOUND - TIME_LEFT_BOUND) / time_layers_num;
-};
+}
 
-void set_a(long double alpha) {
+void tridiagonal_matrix::set_a(long double alpha) {
 	a = alpha;
-};
+}
 
 void tridiagonal_matrix::set_above() {
 	above.reserve(n-1);
-};
+}
 
 void tridiagonal_matrix::set_main() {
 	main.reserve(n);
-	}		
-};
+}
 	
 void tridiagonal_matrix::set_below() {
 	below.reserve(n-1);	
-};
+}
 
-long double f(long double x, long double t) {
-	return 1;
-};
-
-long double u(long double x, long double t) {
-	return 1;
-};
-
-long double mu_0(long double x) {
+long double tridiagonal_matrix::f(long double x, long double t) {
 	return 1;
 }
 
-long double mu_1(long double t) {
+long double tridiagonal_matrix::u(long double x, long double t) {
 	return 1;
-};
+}
+
+long double tridiagonal_matrix::mu_0(long double x) {
+	return 1;
+}
+
+long double tridiagonal_matrix::mu_1(long double t) {
+	return 1;
+}
 	
-long double mu_2(long double t) {
+long double tridiagonal_matrix::mu_2(long double t) {
 	return 1;
-};
+}
 
 std::vector<long double> tridiagonal_matrix::TDMA() {
 	std::vector<long double> w;
@@ -81,4 +80,4 @@ std::vector<long double> tridiagonal_matrix::TDMA() {
 		p[j-1] = g[j-1] - w[j-1]*p[j];
 	}
 	return p;
-};
+}
