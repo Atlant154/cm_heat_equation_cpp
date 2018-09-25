@@ -6,6 +6,8 @@
 
 
 int main(){
+	tridiagonal_matrix t(10, 10);
+	/*
     long unsigned int h_num = 0;
     while(true){
         std::cout << "Hi. Enter here the number of partitions of the object:" << std::endl;
@@ -25,5 +27,6 @@ int main(){
     result_file.open("../result/result.txt", std::ios::out | std::ios::trunc);
     /*TODO make result writing great again */
     result_file.close();
+	*/
     return 0;
 }
