@@ -12,5 +12,3 @@ cmake-build-debug/
 venv/
 
 result/result\.txt
-
-_build/

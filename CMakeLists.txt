@@ -8,7 +8,5 @@ set(headers include/tridiagonal_matrix.h)
 
 add_executable(vychi ${sources} ${headers})
 
-if(GNU)
-	set(CMAKE_CXX_FLAGS_DEBUG  "-O2 -Wall -Wextra -Wshadow -pedantic")
-	set(CMAKE_CXX_FLAGS_RELEASE  "-O3")
-endif()
+set(CMAKE_CXX_FLAGS_DEBUG  "-O2 -Wall -Wextra -Wshadow -pedantic")
+set(CMAKE_CXX_FLAGS_RELEASE  "-O3")
