@@ -5,7 +5,7 @@ tridiagonal_matrix::tridiagonal_matrix(unsigned int h_num, unsigned int time_lay
 {
 	this -> h = (x_right_bound - x_left_bound) / h_num;
 	this -> tau = (time_right_bound - time_left_bound) / time_layers_num;
-    above.reserve(h_num - 1);
+	above.reserve(h_num - 1);
 	main.reserve(h_num);
 	below.reserve(h_num - 1);
 }
