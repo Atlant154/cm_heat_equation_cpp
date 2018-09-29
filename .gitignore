@@ -10,3 +10,5 @@ install_manifest.txt
 cmake-build-debug/
 
 venv/
+
+result/result\.txt
