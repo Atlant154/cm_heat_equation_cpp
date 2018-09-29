@@ -1,32 +1,29 @@
 #include "../include/tridiagonal_matrix.h"
 
-tridiagonal_matrix::tridiagonal_matrix(const unsigned int h_nums, const unsigned int time_layers_nums) {
-	h_num = h_nums;
-	time_layers_num = time_layers_nums;
+tridiagonal_matrix::tridiagonal_matrix(unsigned int h_num, unsigned int time_layers_num) : h_num(h_num), time_layers_num(time_layers_num)
+{
 	set_h();
 	set_tau();
 	n = h_num;
 	set_above();
 	set_main();
 	set_below();
-
-	set_a(0.022);
 }
 
-long double tridiagonal_matrix::get_h() {
+long double tridiagonal_matrix::get_h_() {
 	return h;
 }
 
+long double tridiagonal_matrix::get_tau_() {
+    return tau;
+}
+
 void tridiagonal_matrix::set_h() {
-	h = (X_RIGHT_BOUND - X_LEFT_BOUND) / h_num;
+	h = (x_right_bound - x_right_bound) / h_num;
 }
 
 void tridiagonal_matrix::set_tau() {
-	tau = (TIME_RIGHT_BOUND - TIME_LEFT_BOUND) / time_layers_num;
-}
-
-void tridiagonal_matrix::set_a(long double alpha) {
-	a = alpha;
+	tau = (time_right_bound - time_left_bound) / time_layers_num;
 }
 
 void tridiagonal_matrix::set_above() {
@@ -62,6 +59,7 @@ long double tridiagonal_matrix::mu_2(long double t) {
 }
 
 void tridiagonal_matrix::set_u() {
+	/*TODO correct the logic*/
 	u.reserve((h_num + 1) * time_layers_num)
 	for(unsigned int j = 0; j < h_num + 1; ++j) {
 		u[j] = mu_1(tau*j)
@@ -73,7 +71,8 @@ void tridiagonal_matrix::set_u() {
 	}
 }
 
-std::vector<long double> tridiagonal_matrix::TDMA() {
+std::vector<long double> tridiagonal_matrix::get_result_()
+{
 	std::vector<long double> w;
 	w.reserve(n-1);
 	std::vector<long double> g;

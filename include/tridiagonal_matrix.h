@@ -1,28 +1,24 @@
 #ifndef PROJECT_TRIDIAGONAL_MATRIX_H
 #define PROJECT_TRIDIAGONAL_MATRIX_H
 
-#define X_LEFT_BOUND 0.0
-#define X_RIGHT_BOUND 1.0
-#define TIME_LEFT_BOUND 0.0
-#define TIME_RIGHT_BOUND 1.0
-
 #include<vector>
+
 class tridiagonal_matrix {
 public:
-	tridiagonal_matrix() {};
-	~tridiagonal_matrix() {};
+	/*TODO implement destructor*/
+	~tridiagonal_matrix() = default;
 
-	tridiagonal_matrix(const unsigned int h_num, const unsigned int time_layers_num);
+    explicit tridiagonal_matrix(unsigned int h_num = 1, unsigned int time_layers_num = 1);
 
-	long double get_h();
+	long double get_h_();
 
-	std::vector<long double> TDMA();
+	long double get_tau_();
+
+	std::vector<long double> get_result_();
 private:
 	void set_h();
 
 	void set_tau();
-
-	void set_a(long double alpha);
 
 	long double f(long double x, long double t);
 
@@ -42,17 +38,22 @@ private:
 
 	void set_u();
 
-	long double h = 0;
-	unsigned int n = 0;
-	long double tau = 0;
-	long double a = 0;
-	unsigned int h_num = 0;
-	unsigned int time_layers_num = 0;
+	const double x_left_bound = 0.0;
+	const double x_right_bound = 1.0;
+	const double time_left_bound = 0.0;
+	const double time_right_bound = 1.1;
+
+	const double h = 0;
+	const unsigned int n = 0;
+	const double tau = 0;
+	const double a = 0.0022;
+	const unsigned int h_num = 0;
+	const unsigned int time_layers_num = 0;
 	std::vector<long double> above = {0};
 	std::vector<long double> main = {0};
 	std::vector<long double> below = {0};
 	std::vector<long double> free = {0};
-	std::vector<long double> u = {0};
+	std::vector<long double> results = {0};
 };
 
 
