@@ -8,7 +8,7 @@ public:
 	/*TODO implement destructor*/
 	~tridiagonal_matrix() = default;
 
-    explicit tridiagonal_matrix(unsigned int h_num = 1, unsigned int time_layers_num = 1);
+	explicit tridiagonal_matrix(unsigned int h_num = 1, unsigned int time_layers_num = 1);
 
 	long double get_h_();
 
