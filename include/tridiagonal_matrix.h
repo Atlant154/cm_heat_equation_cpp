@@ -27,7 +27,7 @@ private:
 	const double time_right_bound = 1.0;
 	const double a = 0.0021;
 
-	//Unknown at compile time(define if constructor):
+	//Unknown at compile time(define in constructor):
 	const unsigned int h_num;
 	const unsigned int time_layers_num;
 
