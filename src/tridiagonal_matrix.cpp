@@ -10,11 +10,11 @@ tridiagonal_matrix::tridiagonal_matrix(unsigned int h_num, unsigned int time_lay
 	below.reserve(h_num - 1);
 }
 
-long double tridiagonal_matrix::get_h_() {
+long double tridiagonal_matrix::get_h_() const {
 	return h;
 }
 
-long double tridiagonal_matrix::get_tau_() {
+long double tridiagonal_matrix::get_tau_() const {
     return tau;
 }
 

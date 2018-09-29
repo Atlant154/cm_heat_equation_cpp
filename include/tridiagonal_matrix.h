@@ -10,9 +10,9 @@ public:
 
 	explicit tridiagonal_matrix(unsigned int h_num = 1, unsigned int time_layers_num = 1);
 
-	long double get_h_();
+	long double get_h_() const;
 
-	long double get_tau_();
+	long double get_tau_() const;
 
 	std::vector<long double> get_result_();
 private:
