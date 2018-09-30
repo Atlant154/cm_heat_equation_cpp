@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(vychi)
+project(cm_heat_equation)
 
 set(CMAKE_CXX_STANDARD 14)
 

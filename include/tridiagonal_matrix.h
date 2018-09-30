@@ -14,11 +14,13 @@ public:
 
 	long double get_tau_() const;
 
-	std::vector<long double> get_result_();
+	std::vector<double> get_result_();
 private:
-	double function_of_heat_sources(long double x, long double t);
+	double function_of_heat_sources(double x, double t);
 
-	double function_of_exact_solution(long double x, long double t);
+	double function_of_exact_solution(double x, double t);
+
+	std::vector<double> get_local_result_();
 
 	//Time and space boundaries + diffusivity coefficient(a):
 	const double x_left_bound = 0.0;
@@ -31,13 +33,15 @@ private:
 	const unsigned int h_num;
 	const unsigned int time_layers_num;
 
+
 	double h;
 	double tau;
-	std::vector<long double> above = {0};
-	std::vector<long double> main = {0};
-	std::vector<long double> below = {0};
-	std::vector<long double> free = {0};
-	std::vector<long double> results = {0};
+	double above_coefficient;
+	double main_coefficient;
+	double below_coefficient;
+	std::vector<double> free_part = {0};
+	std::vector<double > local_result = {0};
+	std::vector<double> results = {0};
 };
 
 
