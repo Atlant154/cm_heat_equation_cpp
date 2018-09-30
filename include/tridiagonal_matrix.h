@@ -20,14 +20,14 @@ private:
 
 	double function_of_exact_solution(double x, double t);
 
-	std::vector<double> get_local_result_();
+    void get_local_result_();
 
 	//Time and space boundaries + diffusivity coefficient(a):
 	const double x_left_bound = 0.0;
 	const double x_right_bound = 1.0;
 	const double time_left_bound = 0.0;
 	const double time_right_bound = 1.0;
-	const double a = 0.0021;
+	const double a = 0.0020;
 
 	//Unknown at compile time(define in constructor):
 	const unsigned int h_num;
@@ -39,9 +39,9 @@ private:
 	double above_coefficient;
 	double main_coefficient;
 	double below_coefficient;
-	std::vector<double> free_part = {0};
-	std::vector<double > local_result = {0};
-	std::vector<double> results = {0};
+	std::vector<double> free_part;
+	std::vector<double > local_result;
+	std::vector<double> results;
 };
 
 
