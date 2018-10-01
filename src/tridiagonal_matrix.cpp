@@ -48,6 +48,8 @@ std::vector<double> tridiagonal_matrix::get_result_()
 		//Get boundary condition:
     	free_part_[h_num_ - 1] += (tau_ * a_ / (h_ * h_)) * function_of_exact_solution(x_right_bound_, time_iter * tau_);
     	free_part_[0] += (tau_ * a_ / (h_ * h_)) * function_of_exact_solution(x_left_bound_, time_iter * tau_);
+    	for(auto iter = 0; iter < h_num_; ++iter)
+    		std::cout << "Free: " << free_part_[iter] << ". \n";
     	get_local_result_();
     	std::cout << "Time: " << time_iter * tau_ << ".\n";
     	for(auto iter = local_result_.begin(); iter != local_result_.end(); ++iter)
@@ -57,28 +59,30 @@ std::vector<double> tridiagonal_matrix::get_result_()
 	return results_;
 }
 
-void tridiagonal_matrix::get_local_result_()
-{
-    //Get rank of free part of equation:
-    auto bound = free_part_.size();
-    //Declare method coefficient vectors:
-	std::vector<double> alpha;
+void tridiagonal_matrix::get_local_result_() {
+	auto bound = local_result_.size();
+	std::vector<double> alpha, beta;
 	alpha.reserve(bound);
-	std::vector<double> beta(h_num_);
 	beta.reserve(bound);
-	alpha.emplace_back(below_coefficient_ / main_coefficient_);
-	beta.emplace_back(free_part_[0] / main_coefficient_);
-	//Get method coefficient:
-	for(auto iter = 1; iter < h_num_ - 1; ++iter)
+
+	alpha.push_back(below_coefficient_ / -main_coefficient_);
+	beta.push_back(free_part_[0] / main_coefficient_);
+
+	double common_multiplyer;
+
+	for (auto iter = 1; iter < bound - 1; ++iter)
 	{
-		alpha.emplace_back(above_coefficient_ / (- main_coefficient_ - below_coefficient_ * alpha[iter - 1]));
-		beta.emplace_back((below_coefficient_ * beta[iter - 1] - free_part_[iter]) / (- main_coefficient_ - below_coefficient_ * alpha[iter - 1]));
+		common_multiplyer = 1.0 / ((-1.0) * main_coefficient_ - below_coefficient_ * alpha[iter - 1]);
+		alpha.push_back(above_coefficient_ * common_multiplyer);
+		beta.push_back((below_coefficient_ * beta[iter - 1] - free_part_[iter]) * common_multiplyer);
+		std::cout << "Alpha = " << alpha[iter] << ". Beta = " << beta[iter] << ". \n";
 	}
+
 	local_result_.clear();
 	local_result_.reserve(bound);
-	//Find result on time layer:
-	local_result_.emplace_back((below_coefficient_ * beta[bound - 2] - free_part_[bound - 1]) / (- main_coefficient_ - below_coefficient_ * alpha[bound - 2]));
-	for(auto iter = 1; iter < bound; ++iter) {
-		local_result_.emplace_back(alpha[bound - iter - 1] * local_result_[iter - 1] + beta[bound - iter - 1]);
-	}
+
+	local_result_.push_back((below_coefficient_ * beta[bound - 2] - free_part_[bound - 1]) / ((-1.0) * main_coefficient_ - below_coefficient_ * alpha[bound - 2]));
+
+	for(auto iter = 1; iter < bound; ++iter)
+		local_result_.push_back(alpha[bound - iter - 1] * local_result_[iter - 1] + beta[bound - iter - 1]);
 }
