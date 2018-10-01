@@ -23,25 +23,25 @@ private:
     void get_local_result_();
 
 	//Time and space boundaries + diffusivity coefficient(a):
-	const double x_left_bound = 0.0;
-	const double x_right_bound = 1.0;
-	const double time_left_bound = 0.0;
-	const double time_right_bound = 1.0;
-	const double a = 0.0020;
+	const double x_left_bound_ = 0.0;
+	const double x_right_bound_ = 1.0;
+	const double time_left_bound_ = 0.0;
+	const double time_right_bound_ = 1.0;
+	const double a_ = 0.0020;
 
 	//Unknown at compile time(define in constructor):
-	const unsigned int h_num;
-	const unsigned int time_layers_num;
+	const unsigned int h_num_;
+	const unsigned int time_layers_num_;
 
 
-	double h;
-	double tau;
-	double above_coefficient;
-	double main_coefficient;
-	double below_coefficient;
-	std::vector<double> free_part;
-	std::vector<double > local_result;
-	std::vector<double> results;
+	double h_;
+	double tau_;
+	double above_coefficient_;
+	double main_coefficient_;
+	double below_coefficient_;
+	std::vector<double> free_part_;
+	std::vector<double > local_result_;
+	std::vector<double> results_;
 };
 
 
