@@ -37,16 +37,16 @@ void write_to_file(std::vector<double> results, long unsigned int h_num, long un
     /*TODO fix the getting bounds: */
     result_file << "[[" << 0.0 << ", " << 1.0 << ", " << h_num << "],"
     << "[" << 0.0 << ", " << 1.0 << ", " << time_layers_num << "],[";
-    for(long unsigned int time_iter = 0; time_iter < time_layers_num; ++time_iter)
+    for(long unsigned int time_iter = 0; time_iter < time_layers_num + 1; ++time_iter)
     {
         result_file << "[";
-        for(long unsigned int h_iter = 0; h_iter < h_num; ++h_iter) {
+        for(long unsigned int h_iter = 0; h_iter < h_num + 1; ++h_iter) {
             result_file << results[(time_iter) * (time_layers_num) + h_iter];
-            if(h_iter + 1 != h_num)
+            if(h_iter + 2 != h_num)
                 result_file << ",";
         }
         result_file << "]";
-        if(time_iter + 1 != time_layers_num)
+        if(time_iter + 2 != time_layers_num)
             result_file << ",";
     }
     result_file << "]]";
