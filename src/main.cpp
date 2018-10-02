@@ -35,18 +35,18 @@ void write_to_file(std::vector<double> results, long unsigned int h_num, long un
     std::ofstream result_file;
     result_file.open(RESULT_PATH, std::ios::out | std::ios::trunc);
     /*TODO fix the getting bounds: */
-    result_file << "[[" << 0.0 << ", " << 1.0 << ", " << h_num << "],"
-    << "[" << 0.0 << ", " << 1.0 << ", " << time_layers_num << "],[";
+    result_file << "[[" << 0.0 << ", " << 1.0 << ", " << h_num + 1 << "],"
+    << "[" << 0.0 << ", " << 1.0 << ", " << time_layers_num + 1 << "],[";
     for(long unsigned int time_iter = 0; time_iter < time_layers_num + 1; ++time_iter)
     {
         result_file << "[";
         for(long unsigned int h_iter = 0; h_iter < h_num + 1; ++h_iter) {
             result_file << results[(time_iter) * (time_layers_num) + h_iter];
-            if(h_iter + 2 != h_num)
+            if(h_iter != h_num)
                 result_file << ",";
         }
         result_file << "]";
-        if(time_iter + 2 != time_layers_num)
+        if(time_iter != time_layers_num)
             result_file << ",";
     }
     result_file << "]]";
