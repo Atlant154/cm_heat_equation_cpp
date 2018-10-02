@@ -13,63 +13,58 @@ main_coefficient_(1 + (2 * a_ * tau_) / (h_ * h_))
 {}
 
 long double tridiagonal_matrix::get_h_() const {
-	return h_;
+    return h_;
 }
 
 long double tridiagonal_matrix::get_tau_() const {
     return tau_;
 }
 
-double tridiagonal_matrix::function_of_heat_sources(double x, double t)
-{
-	return 2 * t - exp(x) + x - a_ * ((-1) * t * exp(x) - 12 * pow(x, 2));
+double tridiagonal_matrix::function_of_heat_sources(double x, double t) {
+    return 2 * t - exp(x) + x - a_ * ((-1) * t * exp(x) - 12 * pow(x, 2));
 }
 
-double tridiagonal_matrix::function_of_exact_solution(double x, double t)
-{
-	return (-1) * pow(x, 4) + t * x + pow(t, 2) - t * exp(x);
+double tridiagonal_matrix::function_of_exact_solution(double x, double t) {
+    return (-1) * pow(x, 4) + t * x + pow(t, 2) - t * exp(x);
 }
 
-std::vector<double> tridiagonal_matrix::get_result_()
-{
-	for(auto iter = 0; iter < h_num_; ++iter)
-		local_result_.emplace_back(function_of_exact_solution(iter * h_, 0.0));
+std::vector<double> tridiagonal_matrix::get_result_() {
+    for(auto iter = 0; iter < h_num_; ++iter)
+        local_result_.emplace_back(function_of_exact_solution(iter * h_, 0.0));
 
-	for(auto time_iter = 1; time_iter < time_layers_num_; ++time_iter)
-	{
-		for(auto space_iter = 0; space_iter < h_num_; ++space_iter)
-			free_part_.emplace_back(local_result_[space_iter] + tau_ + function_of_heat_sources(space_iter * h_, time_iter * tau_));
-		free_part_[0] += (tau_ * a_ / (h_ * h_)) * function_of_exact_solution(x_left_bound_, time_iter * tau_);
-		free_part_[h_num_ - 1] += (tau_ * a_ / (h_ * h_)) * function_of_exact_solution(x_right_bound_, time_iter * tau_);
-		get_local_result_();
-		results_.insert(results_.end(), local_result_.begin(), local_result_.end());
-		free_part_.clear();
-	}
-	return results_;
+    for(auto time_iter = 1; time_iter < time_layers_num_; ++time_iter) {
+        for(auto space_iter = 0; space_iter < h_num_; ++space_iter)
+            free_part_.emplace_back(local_result_[space_iter] + tau_ + function_of_heat_sources(space_iter * h_, time_iter * tau_));
+        free_part_[0] += (tau_ * a_ / (h_ * h_)) * function_of_exact_solution(x_left_bound_, time_iter * tau_);
+        free_part_[h_num_ - 1] += (tau_ * a_ / (h_ * h_)) * function_of_exact_solution(x_right_bound_, time_iter * tau_);
+        get_local_result_();
+        results_.insert(results_.end(), local_result_.begin(), local_result_.end());
+        free_part_.clear();
+    }
+    return results_;
 }
 
 void tridiagonal_matrix::get_local_result_() {
-	auto bound = free_part_.size() - 1;
-	std::vector<double> alpha, beta;
-	alpha.reserve(bound);
-	beta.reserve(bound);
+    auto bound = free_part_.size() - 1;
+    std::vector<double> alpha, beta;
+    alpha.reserve(bound);
+    beta.reserve(bound);
 
-	alpha.emplace_back(below_coefficient_ / - main_coefficient_);
-	beta.emplace_back(free_part_.at(0) / main_coefficient_);
+    alpha.emplace_back(below_coefficient_ / - main_coefficient_);
+    beta.emplace_back(free_part_.at(0) / main_coefficient_);
 
-	double common_multiplyer;
+    double common_multiplyer;
 
-	for (auto iter = 1; iter < bound - 1; ++iter)
-	{
-		common_multiplyer = 1.0 / ((-1.0) * main_coefficient_ - below_coefficient_ * alpha.back());
-		alpha.emplace_back(above_coefficient_ * common_multiplyer);
-		beta.emplace_back((below_coefficient_ * beta.back() - free_part_[iter]) * common_multiplyer);
-	}
+    for (auto iter = 1; iter < bound - 1; ++iter) {
+        common_multiplyer = 1.0 / ((-1.0) * main_coefficient_ - below_coefficient_ * alpha.back());
+        alpha.emplace_back(above_coefficient_ * common_multiplyer);
+        beta.emplace_back((below_coefficient_ * beta.back() - free_part_[iter]) * common_multiplyer);
+    }
 
-	local_result_.clear();
+    local_result_.clear();
 
-	local_result_.emplace_back((below_coefficient_ * beta[bound - 2] - free_part_[bound - 1]) / ((-1.0) * main_coefficient_ - below_coefficient_ * alpha[bound - 2]));
+    local_result_.emplace_back((below_coefficient_ * beta[bound - 2] - free_part_[bound - 1]) / ((-1.0) * main_coefficient_ - below_coefficient_ * alpha[bound - 2]));
 
-	for(auto iter = 1; iter < bound; ++iter)
-		local_result_.emplace_back(alpha[bound - iter - 1] * local_result_[iter - 1] + beta[bound - iter - 1]);
+    for(auto iter = 1; iter < bound; ++iter)
+        local_result_.emplace_back(alpha[bound - iter - 1] * local_result_[iter - 1] + beta[bound - iter - 1]);
 }
