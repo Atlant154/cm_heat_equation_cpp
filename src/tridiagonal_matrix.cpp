@@ -22,14 +22,12 @@ long double tridiagonal_matrix::get_tau() const {
     return tau_;
 }
 
-double tridiagonal_matrix::function_of_heat_sources(double x, double t)
-{
-	return 2 * t - exp(x) + x - a_ * ((-1) * t * exp(x) - 12 * pow(x, 2));
+double tridiagonal_matrix::function_of_heat_sources(double x, double t) {
+    return 2 * t - exp(x) + x - a_ * ((-1) * t * exp(x) - 12 * pow(x, 2));
 }
 
-double tridiagonal_matrix::function_of_exact_solution(double x, double t)
-{
-	return (-1) * pow(x, 4) + t * x + pow(t, 2) - t * exp(x);
+double tridiagonal_matrix::function_of_exact_solution(double x, double t) {
+    return (-1) * pow(x, 4) + t * x + pow(t, 2) - t * exp(x);
 }
 
 void tridiagonal_matrix::get_result_()
