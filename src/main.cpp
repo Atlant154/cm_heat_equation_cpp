@@ -1,11 +1,6 @@
 #include <iostream>
-#include <fstream>
 
 #include "../include/tridiagonal_matrix.h"
-
-#define RESULT_PATH "../result/result.txt"
-
-void write_to_file(std::vector<double> results, long unsigned int h_num, long unsigned int time_layers_num);
 
 int main(){
     unsigned int h_num = 0;
@@ -22,33 +17,8 @@ int main(){
         if(time_layers_num > 0)
             break;
     }
-    //Test data:
     tridiagonal_matrix test_class_member(h_num, time_layers_num);
-    std::vector<double> results = test_class_member.get_result_();
-    write_to_file(results, h_num, time_layers_num);
-    /* TODO make calculation great again */
+    test_class_member.get_result_();
+    test_class_member.write_result();
     return 0;
-}
-
-void write_to_file(std::vector<double> results, long unsigned int h_num, long unsigned int time_layers_num)
-{
-    std::ofstream result_file;
-    result_file.open(RESULT_PATH, std::ios::out | std::ios::trunc);
-    /*TODO fix the getting bounds: */
-    result_file << "[[" << 0.0 << ", " << 1.0 << ", " << h_num + 1 << "],"
-    << "[" << 0.0 << ", " << 1.0 << ", " << time_layers_num + 1 << "],[";
-    for(long unsigned int time_iter = 0; time_iter < time_layers_num + 1; ++time_iter)
-    {
-        result_file << "[";
-        for(long unsigned int h_iter = 0; h_iter < h_num + 1; ++h_iter) {
-            result_file << results[(time_iter) * (time_layers_num) + h_iter];
-            if(h_iter != h_num)
-                result_file << ",";
-        }
-        result_file << "]";
-        if(time_iter != time_layers_num)
-            result_file << ",";
-    }
-    result_file << "]]";
-    result_file.close();
 }
