@@ -1,7 +1,7 @@
 #ifndef PROJECT_TRIDIAGONAL_MATRIX_H
 #define PROJECT_TRIDIAGONAL_MATRIX_H
 
-#include<vector>
+#include <vector>
 #include <fstream>
 
 class tridiagonal_matrix {
@@ -11,13 +11,14 @@ public:
 
 	explicit tridiagonal_matrix(unsigned int h_num = 1, unsigned int time_layers_num = 1);
 
-	long double get_h() const;
-
-	long double get_tau() const;
-
 	void write_result() const;
 
+	double get_max_error() const;
+
     void get_result_();
+
+    double get_error();
+
 private:
 
 	double function_of_heat_sources(double x, double t);
@@ -44,6 +45,8 @@ private:
 	const double above_coefficient_;
 	const double main_coefficient_;
 	const double below_coefficient_;
+
+	double error_ = 0.0;
 	std::vector<double> free_part_;
 	std::vector<double > local_result_;
 	std::vector<std::vector<double>> results_;

@@ -14,14 +14,6 @@ local_result_(h_num_),
 free_part_(h_num_)
 {}
 
-long double tridiagonal_matrix::get_h() const {
-	return h_;
-}
-
-long double tridiagonal_matrix::get_tau() const {
-    return tau_;
-}
-
 double tridiagonal_matrix::function_of_heat_sources(double x, double t) {
     return 2 * t - exp(x) + x - a_ * ((-1) * t * exp(x) - 12 * pow(x, 2));
 }
@@ -41,7 +33,7 @@ void tridiagonal_matrix::get_result_()
 		for(auto space_iter = 0; space_iter < h_num_; ++space_iter)
 			free_part_[space_iter] = local_result_[space_iter] + tau_ * function_of_heat_sources(space_iter * h_, time_iter * tau_);
 		free_part_[0] += ((tau_ * a_) / (h_ * h_)) * function_of_exact_solution(x_left_bound_, time_iter * tau_);
-		free_part_[h_num_] += ((tau_ * a_) / (h_ * h_)) * function_of_exact_solution(x_right_bound_, time_iter * tau_);
+		free_part_[h_num_ - 1] += ((tau_ * a_) / (h_ * h_)) * function_of_exact_solution(x_right_bound_, time_iter * tau_);
 		get_time_layer_result_();
 		results_.emplace_back(local_result_);
 	}
@@ -49,7 +41,7 @@ void tridiagonal_matrix::get_result_()
 
 void tridiagonal_matrix::get_time_layer_result_()
 {
-	auto bound = free_part_.size();
+	auto bound = h_num_;
 	std::vector<double> alpha(bound), beta(bound);
 
 	alpha[0] = above_coefficient_ / main_coefficient_;
@@ -91,4 +83,24 @@ void tridiagonal_matrix::write_result() const
 	}
 	result_file << "]\n";
 	result_file.close();
+}
+
+double tridiagonal_matrix::get_error()
+{
+    double abs_exact_solution, abs_our_solution, results_difference;
+    for(auto time_iter = 1; time_iter < time_layers_num_; ++time_iter)
+        for(auto space_iter = 1; space_iter < h_num_ - 1; ++space_iter)
+        {
+            abs_exact_solution = std::abs(function_of_exact_solution(space_iter * h_, time_iter * tau_));
+            abs_our_solution = std::abs(results_[time_iter][space_iter]);
+            results_difference = std::abs(abs_exact_solution - abs_our_solution);
+            if(results_difference > error_)
+                error_ = results_difference;
+        }
+    return error_;
+}
+
+double tridiagonal_matrix::get_max_error() const
+{
+    return tau_ + h_ * h_;
 }
