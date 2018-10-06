@@ -41,8 +41,8 @@ private:
 	//Get the values during the initialization of
 	//h_hum and time_layers_num.
 	const double h_;
+    const double tau_;
 	const double courant_number_;
-	const double tau_;
 	const double above_coefficient_;
 	const double main_coefficient_;
 	const double below_coefficient_;

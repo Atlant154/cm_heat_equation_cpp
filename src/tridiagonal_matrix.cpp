@@ -1,12 +1,14 @@
 #include "../include/tridiagonal_matrix.h"
 #include <cmath>
+#include <algorithm>
 
 tridiagonal_matrix::tridiagonal_matrix(unsigned int h_num, unsigned int time_layers_num)
-: h_num_(h_num + 1),
+:
+h_num_(h_num + 1),
 time_layers_num_(time_layers_num + 1),
-h_((x_right_bound_ - x_left_bound_) / h_num),
+h_((x_right_bound_ - x_left_bound_) / h_num_),
+tau_((time_right_bound_ - time_left_bound_) / time_layers_num_),
 courant_number_((-a_) / std::pow(h_, 2)),
-tau_((time_right_bound_ - time_left_bound_) / time_layers_num),
 above_coefficient_(tau_ * courant_number_),
 below_coefficient_(above_coefficient_),
 main_coefficient_(1 + 2 * courant_number_ * tau_)
@@ -22,60 +24,69 @@ double tridiagonal_matrix::function_of_exact_solution(double x, double t) {
 
 void tridiagonal_matrix::get_result_()
 {
+    local_result_.clear();
     local_result_.reserve(h_num_);
-    free_part_.reserve(h_num_ - 2);
-	for(auto iter = 0; iter < h_num_; ++iter)
-		local_result_.emplace_back(function_of_exact_solution(iter * h_, 0.0));
-	results_.emplace_back(local_result_);
+    results_.reserve(h_num_ * time_layers_num_);
 
-	for(auto time_iter = 1; time_iter < time_layers_num_; ++time_iter)
-	{
-		for(auto space_iter = 0; space_iter < h_num_ - 2; ++space_iter)
-			free_part_.emplace_back(local_result_[space_iter + 1] + tau_ * function_of_heat_sources((space_iter + 1) * h_, time_iter * tau_));
-		free_part_[0] += tau_ * courant_number_ * function_of_exact_solution(x_left_bound_, time_iter * tau_);
-		free_part_.back() += tau_ * courant_number_ * function_of_exact_solution(x_right_bound_, time_iter * tau_);
-		local_result_.clear();
-		local_result_.emplace_back(function_of_exact_solution(x_right_bound_, time_iter * tau_));
-		ta_result = get_time_layer_result_();
-		free_part_.clear();
-		local_result_.insert(local_result_.end(), ta_result.begin(), ta_result.end());
+    for(auto iter = 0; iter < h_num_; ++iter)
+        local_result_.emplace_back(function_of_exact_solution(iter * h_, 0.0));
+
+    results_.emplace_back(local_result_);
+    free_part_.clear();
+
+    for(auto time_iter = 1; time_iter < time_layers_num_; ++time_iter)
+    {
+        //Get free part of equation:
+        for(auto space_iter = 1; space_iter < h_num_ - 1; ++space_iter)
+            free_part_.emplace_back(local_result_[space_iter] + tau_ * function_of_heat_sources(space_iter * h_, time_iter * tau_));
+
+        //Add bound conditions:
+        free_part_[0] += courant_number_ * tau_ * function_of_exact_solution(x_left_bound_, time_iter * tau_);
+        free_part_[h_num_ - 2] += courant_number_ * tau_ * function_of_exact_solution(x_right_bound_, time_iter * tau_);
+
+        //Clear local(time layer) result vector:
+        local_result_.clear();
+
+        //Get part of result from modified Thomas Algorithm:
+        ta_result = get_time_layer_result_();
+
+        //Clear free part vector:
+        free_part_.clear();
+
         local_result_.emplace_back(function_of_exact_solution(x_left_bound_, time_iter * tau_));
-		results_.emplace_back(local_result_);
-	}
+        local_result_.insert(local_result_.end(), ta_result.begin(), ta_result.end());
+        local_result_.emplace_back(function_of_exact_solution(x_right_bound_, time_iter * tau_));
+
+        results_.emplace_back(local_result_);
+    }
+    local_result_.clear();
 }
 
 std::vector<double> tridiagonal_matrix::get_time_layer_result_()
 {
-    auto bound = free_part_.size() - 1;
+    auto n = free_part_.size();
 
-    std::vector<double> alpha, beta;
+    std::vector<double> alpha(n - 1), beta(n);
+    std::vector<double> result(n);
 
-    alpha.reserve(bound);
-    beta.reserve(bound + 1);
+    alpha[0] = above_coefficient_ / main_coefficient_;
+    beta[0] = free_part_[0] / main_coefficient_;
 
-    alpha.emplace_back(below_coefficient_ / -main_coefficient_);
-    beta.emplace_back(free_part_[0] / main_coefficient_);
+    double co_factor;
 
-    double common_factor;
-
-    for(auto iter = 1; iter < bound - 1; ++iter)
+    for(auto iter = 1; iter < n - 1; ++iter)
     {
-        common_factor = 1.0 / (-main_coefficient_ - below_coefficient_ * alpha.back());
-        alpha.emplace_back(above_coefficient_ * common_factor);
-        beta.emplace_back((below_coefficient_ * beta.back() - free_part_[iter]) * common_factor);
+        co_factor = 1.0 / (main_coefficient_ - below_coefficient_ * alpha[iter - 1]);
+        alpha[iter] = above_coefficient_ * co_factor;
+        beta[iter] = (free_part_[iter] - above_coefficient_ * beta[iter - 1]) * co_factor;
     }
 
-    std::vector<double> local_solution;
+    result[n - 1] = (free_part_[n - 1] - above_coefficient_ * beta[n - 2]) / (main_coefficient_ - below_coefficient_ * alpha[n - 2]);
 
-    local_solution.reserve(bound + 1);
+    for(auto iter = n - 1; iter > 0; --iter)
+        result[iter - 1] = beta[iter - 1] - alpha[iter - 1] * result[iter];
 
-    local_solution.emplace_back((below_coefficient_ * beta.back() - free_part_.back())
-    / (-main_coefficient_ - below_coefficient_ * alpha.back()));
-
-    for(auto iter = 1; iter < bound; ++iter)
-        local_solution.emplace_back(alpha[bound - iter - 1] * local_solution.back() + beta[bound - iter - 1]);
-
-    return local_solution;
+    return result;
 }
 
 void tridiagonal_matrix::write_result() const
