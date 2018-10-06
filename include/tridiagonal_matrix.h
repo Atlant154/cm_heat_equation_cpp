@@ -25,14 +25,14 @@ private:
 
 	double function_of_exact_solution(double x, double t);
 
-    void get_time_layer_result_();
+    std::vector<double> get_time_layer_result_();
 
 	//Time and space boundaries + diffusivity coefficient(a):
 	const double x_left_bound_ = 0.0;
 	const double x_right_bound_ = 1.0;
 	const double time_left_bound_ = 0.0;
 	const double time_right_bound_ = 1.0;
-	const double a_ = 0.0020;
+	const double a_ = 0.020;
 
 	//Unknown at compile time(define in constructor):
 	const unsigned int h_num_;
@@ -41,6 +41,7 @@ private:
 	//Get the values during the initialization of
 	//h_hum and time_layers_num.
 	const double h_;
+	const double courant_number_;
 	const double tau_;
 	const double above_coefficient_;
 	const double main_coefficient_;
@@ -48,7 +49,8 @@ private:
 
 	double error_ = 0.0;
 	std::vector<double> free_part_;
-	std::vector<double > local_result_;
+	std::vector<double> local_result_;
+	std::vector<double> ta_result;
 	std::vector<std::vector<double>> results_;
 };
 
