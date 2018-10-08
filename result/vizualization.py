@@ -12,11 +12,26 @@ with open('result.txt', 'r') as file:
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 
+X_LEFT_BOUND = np.float64(data[0][0])
+X_RIGHT_BOUND = np.float64(data[0][1])
+H_num = np.float64(data[0][2])
+X_LIN = np.linspace(X_LEFT_BOUND, X_RIGHT_BOUND, H_num)
+
+TIME_LEFT_BOUND = np.float64(data[1][0])
+TIME_RIGHT_BOUND = np.float64(data[1][1])
+Time_layers_num = np.float64(data[1][2])
+Y_LIN = np.linspace(TIME_LEFT_BOUND, TIME_RIGHT_BOUND, Time_layers_num)
+
 # Make data.
-X = np.array(np.arange(np.float64(data[0][0]), np.float64(data[0][1]), np.float64(data[0][2])))
-Y = np.array(np.arange(np.float64(data[1][0]), np.float64(data[1][1]), np.float64(data[1][2])))
+X = X_LIN
+Y = Y_LIN
+print(Y.shape)
+print(X)
+print(Y.shape)
 Z = np.array(data[2])
+print(Z.shape)
 X, Y = np.meshgrid(X, Y)
+print(X.shape)
 
 
 # Plot the surface.
@@ -31,8 +46,8 @@ ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 # Add a color bar which maps values to colors.
 fig.colorbar(surf, shrink=0.5, aspect=5)
 
-ax.set_xlabel('X axis')
-ax.set_ylabel('Y axis')
-ax.set_zlabel('Z axis')
+ax.set_xlabel('X')
+ax.set_ylabel('Time')
+ax.set_zlabel('Temperature')
 
 plt.show()
