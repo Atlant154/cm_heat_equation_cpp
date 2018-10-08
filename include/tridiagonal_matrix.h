@@ -1,8 +1,11 @@
 #ifndef PROJECT_TRIDIAGONAL_MATRIX_H
 #define PROJECT_TRIDIAGONAL_MATRIX_H
 
+#include <cmath>
+#include <vector>
 
 class tridiagonal_matrix {
+public:
 
 	explicit tridiagonal_matrix(unsigned int h_num = 1, unsigned int time_layers_num = 1);
 

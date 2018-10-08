@@ -1,5 +1,7 @@
 #include "../include/tridiagonal_matrix.h"
 
+#include <fstream>
+
 tridiagonal_matrix::tridiagonal_matrix(unsigned int h_num, unsigned int time_layers_num)
 :
 h_num_(h_num + 1),
@@ -7,7 +9,7 @@ time_layers_num_(time_layers_num + 1),
 h_((x_right_bound_ - x_left_bound_) / h_num_),
 tau_((time_right_bound_ - time_left_bound_) / time_layers_num_),
 matrix_main_((- a_ * tau_) / pow(h_, 2)),
-matrix_above_(1 + 2 * matrix_main_)
+matrix_above_(1.0 + 2.0 * matrix_main_)
 {}
 
 double tridiagonal_matrix::function_of_heat_sources(double x, double t) {
@@ -36,7 +38,7 @@ void tridiagonal_matrix::get_result_()
     {
         //Get free part of equation:
         for(auto space_iter = 1; space_iter < h_num_ - 1; ++space_iter)
-            free_part_.emplace_back(local_result_[space_iter] + tau_ * function_of_heat_sources(space_iter * h_, time_iter * tau_));
+            free_part_.emplace_back(local_result_[space_iter + 1] + tau_ * function_of_heat_sources((space_iter + 1) * h_, time_iter * tau_));
 
         //Add bound conditions:
         free_part_[0] += courant_number * function_of_exact_solution(x_left_bound_, time_iter * tau_);
@@ -94,7 +96,7 @@ void tridiagonal_matrix::write_result() const
 	std::fstream result_file;
 	result_file.open("../result/result.txt", std::ios::out | std::ios::trunc);
 	result_file << "[[" << x_right_bound_ << "," << x_left_bound_ << ", " << h_num_ << "],"
-	<< "[" << time_left_bound_ << "," << time_right_bound_ << ", " << time_layers_num_ << "],";
+	<< "[" << time_left_bound_ << "," << time_right_bound_ << ", " << time_layers_num_ << "],[";
 	for(auto time_iter = 0; time_iter < time_layers_num_; ++time_iter)
 	{
 		result_file << "[";
@@ -108,7 +110,7 @@ void tridiagonal_matrix::write_result() const
 		if(time_iter + 1 != time_layers_num_)
 			result_file << ",";
 	}
-	result_file << "]\n";
+	result_file << "]]\n";
 	result_file.close();
 }
 

@@ -6,24 +6,22 @@
 
 
 int main(){
-    long unsigned int h_num = 0;
+    unsigned int h_num = 0;
     while(true){
         std::cout << "Hi. Enter here the number of partitions of the object:" << std::endl;
         std::cin >> h_num;
         if(h_num > 0)
             break;
     }
-    long unsigned int time_layers_num = 0;
+    unsigned int time_layers_num = 0;
     while(true){
         std::cout << "Put number of time layers here:" << std::endl;
         std::cin >> time_layers_num;
         if(time_layers_num > 0)
             break;
     }
-    /* TODO make calculation great again */
-    std::ofstream result_file;
-    result_file.open("../result/result.txt", std::ios::out | std::ios::trunc);
-    /*TODO make result writing great again */
-    result_file.close();
+    tridiagonal_matrix test_class_member(h_num, time_layers_num);
+    test_class_member.get_result_();
+    test_class_member.write_result();
     return 0;
 }
