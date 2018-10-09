@@ -40,8 +40,8 @@ private:
 	//h_hum and time_layers_num.
 	const double h_;
     const double tau_;
+    const double matrix_above_;
 	const double matrix_main_;
-	const double matrix_above_;
 
 	double error_ = 0.0;
 	std::vector<double> free_part_;

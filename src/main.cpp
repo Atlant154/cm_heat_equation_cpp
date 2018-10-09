@@ -23,5 +23,6 @@ int main(){
     tridiagonal_matrix test_class_member(h_num, time_layers_num);
     test_class_member.get_result_();
     test_class_member.write_result();
+    std::cout << "Error is: " << test_class_member.get_error() << "." << std::endl;
     return 0;
 }
