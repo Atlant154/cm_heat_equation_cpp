@@ -2,6 +2,17 @@
 
 ![Logo](docs/logo.jpg)
 
+## Table of content
+
+- [Heat equation. C++ implementation.](#heat-equation-c---implementation)
+  * [Problem](#problem)
+  * [Requirements](#requirements)
+  * [How to start](#how-to-start)
+  * [Visualization](#visualization)
+  * [Solution and hacks](#solution-and-hacks)
+    + [Thomas Algorithm](#thomas-algorithm)
+    + [Finding solution](#finding-solution)
+
 ## Problem
 
 We need to solve a [partial differential equation](https://en.wikipedia.org/wiki/Partial_differential_equation) of [heat equation](https://en.wikipedia.org/wiki/Heat_equation) using [implicit Euler method](https://en.wikipedia.org/wiki/Backward_Euler_method).  
@@ -26,4 +37,21 @@ To visualize the data obtained during the execution of the program, do the follo
 
 ![Visualization](docs/vis.png)
 
-Also in the `./result` directory there is a `check.py` script, which is easily configured to get an image of the exact solution, if there is one.
+Also in the `./result` directory there is a `check.py` script, which is easily configured to get an image of the exact solution,
+if there is one.
+
+## Solution and hacks
+
+### Thomas Algorithm
+
+To solve three-diagonal matrix that appears during the solution, the
+[Thomas Algorithm](https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm) is traditionally used.
+At my decision applies a modified version of the algorithm, as the diagonal of the matrix composed of
+the same elements, as well upper and lower diagonal coincide.  
+This change gives a significant performance boost, but you will not able to use this implementation
+in other projects.
+
+### Finding solution
+
+To store the solution before writing to the file, cpp vectors are used. This approach is slower than
+raw arrays, but not much(less than 10%).
