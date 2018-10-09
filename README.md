@@ -18,3 +18,12 @@ We need to solve a [partial differential equation](https://en.wikipedia.org/wiki
 2. Move to directory: `cd cm_heat_equation_cpp`
 3. Build the project: `cmake -DCMAKE_BUILD_TYPE=Release .. && make`
 4. Run the program: `./cm_heat_equation_cpp`
+
+## Visualization
+
+After running the program in the `./result` directory, the `result.txt` file is generated.  
+To visualize the data obtained during the execution of the program, do the following command: `cd results && python3 vizualization.py`
+
+![Visualization](docs/vis.png)
+
+Also in the `./result` directory there is a `check.py` script, which is easily configured to get an image of the exact solution, if there is one.
