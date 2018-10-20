@@ -12,6 +12,8 @@
   * [Solution and hacks](#solution-and-hacks)
     + [Thomas Algorithm](#thomas-algorithm)
     + [Finding solution](#finding-solution)
+  * [Benchmarks](#benchmarks)
+  * [Calculation error](#calculation-error)
 
 ## Problem
 
@@ -19,9 +21,9 @@ We need to solve a [partial differential equation](https://en.wikipedia.org/wiki
 
 ## Requirements
 
-* CMake.
-* G++ compiler.
-* Python 3* with installed matplotlib.
+* [CMake](https://cmake.org/) v3.10 performance guaranteed.
+* [G++ compiler](https://gcc.gnu.org/) v7.3 performance guaranteed.
+* [Python](https://www.python.org/) 3* with installed [matplotlib](https://matplotlib.org/) for visualization.
 
 ## How to start
 
