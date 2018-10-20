@@ -60,10 +60,9 @@ raw arrays, but not much(less than 10%).
 
 All results were obtained by running benchmark of 10'000 times. The benchmark consisted of created object + and calculating an approximate solution. The problem was considered with hundred of time layers.
 
-|        Splits:       |     128    |     512    | 1'024      | 8'192      | 32'768    | 131'072 |
-|:--------------------:|:----------:|:----------:|------------|------------|-----------|---------|
-|   Cpp(unoptimized):  | 604.942 μs | 2307.75 μs | 4226.58 μs | 34498.1 μs | 143869 μs |         |
-| Python(unoptimized): |            |            |            |            |           |         |
+|      Splits:      |     128    |     512    | 1'024      | 8'192      | 32'768    | 131'072   |
+|:-----------------:|:----------:|:----------:|------------|------------|-----------|-----------|
+| Cpp(unoptimized): | 604.942 μs | 2307.75 μs | 4226.58 μs | 34498.1 μs | 143869 μs | 579175 μs |
 
 Configuration of the system on which the testing was conducted: Intel I7-6700 + 16GB RAM.
 
