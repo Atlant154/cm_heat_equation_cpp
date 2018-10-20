@@ -12,6 +12,8 @@
   * [Solution and hacks](#solution-and-hacks)
     + [Thomas Algorithm](#thomas-algorithm)
     + [Finding solution](#finding-solution)
+  * [Benchmarks](#benchmarks)
+  * [Calculation error](#calculation-error)
 
 ## Problem
 
@@ -19,9 +21,9 @@ We need to solve a [partial differential equation](https://en.wikipedia.org/wiki
 
 ## Requirements
 
-* CMake.
-* G++ compiler.
-* Python 3* with installed matplotlib.
+* [CMake](https://cmake.org/) v3.10 performance guaranteed.
+* [G++ compiler](https://gcc.gnu.org/) v7.3 performance guaranteed.
+* [Python](https://www.python.org/) 3* with installed [matplotlib](https://matplotlib.org/) for visualization.
 
 ## How to start
 
@@ -63,7 +65,6 @@ All results were obtained by running benchmark of 10'000 times. The benchmark co
 |        Splits:       |     128    |     512    | 1'024      | 8'192      | 32'768    | 131'072 |
 |:--------------------:|:----------:|:----------:|------------|------------|-----------|---------|
 |   Cpp(unoptimized):  | 604.942 μs | 2307.75 μs | 4226.58 μs | 34498.1 μs | 143869 μs |         |
-| Python(unoptimized): |            |            |            |            |           |         |
 
 Configuration of the system on which the testing was conducted: Intel I7-6700 + 16GB RAM.
 
