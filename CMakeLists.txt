@@ -3,8 +3,8 @@ project(cm_heat_equation)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(sources main.cpp src/tridiagonal_matrix.cpp)
-set(headers include/tridiagonal_matrix.h)
+set(sources main.cpp src/heat_equation.cpp)
+set(headers include/heat_equation.h)
 
 add_executable(cm_heat_equation ${sources} ${headers})
 

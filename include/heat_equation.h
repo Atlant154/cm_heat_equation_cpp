@@ -4,10 +4,10 @@
 #include <cmath>
 #include <vector>
 
-class tridiagonal_matrix {
+class heat_equation {
 public:
 
-    explicit tridiagonal_matrix(unsigned int h_num = 1, unsigned int time_layers_num = 1);
+    explicit heat_equation(unsigned int h_num = 1, unsigned int time_layers_num = 1);
 
     void write_result() const;
 

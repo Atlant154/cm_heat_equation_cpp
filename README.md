@@ -60,7 +60,7 @@ raw arrays, but not much(less than 10%).
 
 ## Benchmarks
 
-All results were obtained by running benchmark of 10'000 times. The benchmark consisted of created object + and calculating an approximate solution. The problem was considered with hundred of time layers.
+All results were obtained by running benchmark of 10'000 times. The benchmark consisted of creating object + calculating an approximate solution. The problem was considered with hundred of time layers.
 
 |      Splits:      |     128    |     512    | 1'024      | 8'192      | 32'768    | 131'072   |
 |:-----------------:|:----------:|:----------:|------------|------------|-----------|-----------|
