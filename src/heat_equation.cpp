@@ -1,8 +1,8 @@
-#include "../include/tridiagonal_matrix.h"
+#include "../include/heat_equation.h"
 
 #include <fstream>
 
-tridiagonal_matrix::tridiagonal_matrix(unsigned int h_num, unsigned int time_layers_num)
+heat_equation::heat_equation(unsigned int h_num, unsigned int time_layers_num)
         :
         h_num_(h_num + 1),
         time_layers_num_(time_layers_num + 1),
@@ -11,15 +11,15 @@ tridiagonal_matrix::tridiagonal_matrix(unsigned int h_num, unsigned int time_lay
         matrix_above_((-a_ * tau_) / pow(h_, 2)),
         matrix_main_(1.0 + 2.0 * a_ * tau_ / pow(h_, 2)) {}
 
-double tridiagonal_matrix::function_of_heat_sources(double x, double t) {
+double heat_equation::function_of_heat_sources(double x, double t) {
     return 2 * t - exp(x) + x - a_ * ((-1) * t * exp(x) - 12 * pow(x, 2));
 }
 
-double tridiagonal_matrix::function_of_exact_solution(double x, double t) {
+double heat_equation::function_of_exact_solution(double x, double t) {
     return (-1) * pow(x, 4) + t * x + pow(t, 2) - t * exp(x);
 }
 
-void tridiagonal_matrix::get_result() {
+void heat_equation::get_result() {
     local_result_.reserve(h_num_);
     results_.reserve(h_num_ * time_layers_num_);
 
@@ -54,7 +54,7 @@ void tridiagonal_matrix::get_result() {
     local_result_.clear();
 }
 
-std::vector<double> tridiagonal_matrix::get_time_layer_result() {
+std::vector<double> heat_equation::get_time_layer_result() {
     auto n = free_part_.size();
 
     std::vector<double> result(n);
@@ -80,7 +80,7 @@ std::vector<double> tridiagonal_matrix::get_time_layer_result() {
     return result;
 }
 
-void tridiagonal_matrix::write_result() const {
+void heat_equation::write_result() const {
     std::fstream result_file;
     result_file.open("../result/result.txt", std::ios::out | std::ios::trunc);
     result_file << "[[" << x_right_bound_ << "," << x_left_bound_ << ", " << h_num_ << "],"
@@ -100,7 +100,7 @@ void tridiagonal_matrix::write_result() const {
     result_file.close();
 }
 
-double tridiagonal_matrix::get_error() {
+double heat_equation::get_error() {
     double abs_exact_solution, abs_our_solution, results_difference;
     for (unsigned time_iter = 1; time_iter < time_layers_num_ - 1; ++time_iter)
         for (unsigned space_iter = 0; space_iter < h_num_; ++space_iter) {
@@ -113,6 +113,6 @@ double tridiagonal_matrix::get_error() {
     return error_;
 }
 
-double tridiagonal_matrix::get_max_error() const {
+double heat_equation::get_max_error() const {
     return tau_ + h_ * h_;
 }
