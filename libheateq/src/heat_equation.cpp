@@ -43,7 +43,7 @@ heat_equation::heat_equation(double (*heat_sources)(double, double),
 
         time_layer.clear();
         time_layer.emplace_back(exact_solution(x_left_bound_, time_iter * tau_));
-        std::copy(ta_result.begin(), ta_result.end(), std::back_inserter(time_layer));
+        time_layer.insert(time_layer.end(), ta_result.begin(), ta_result.end());
         time_layer.emplace_back(exact_solution(x_right_bound_, time_iter * tau_));
 
         results_.emplace_back(time_layer);
@@ -172,10 +172,15 @@ void heat_equation::write_error_plot(double (*exact_solution)(double, double)) c
 double heat_equation::get_error(double (*exact_solution)(double, double)) const
 {
     double error = 0.0;
+    double abs_appr, abs_exact;
 
     for (uint32_t time_iter = 1; time_iter < time_layers_num_; ++time_iter)
         for (uint32_t space_iter = 1; space_iter < h_num_ - 1; ++space_iter)
-            error += std::abs(exact_solution(space_iter * h_, time_iter * tau_) - results_[time_iter][space_iter]);
+        {
+            abs_appr = std::abs(results_[time_iter][space_iter]);
+            abs_exact = std::abs(exact_solution(x_left_bound_ + space_iter * h_, time_left_bound_ + time_iter * tau_));
+            error += std::abs(abs_exact - abs_appr);
+        }
 
     return error * tau_ * h_;
 }

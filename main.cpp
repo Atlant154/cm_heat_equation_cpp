@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "include/heat_equation.h"
+#include "libheateq/include/heat_equation.h"
 
 double const diffusivity_coefficient = 0.020;
 
