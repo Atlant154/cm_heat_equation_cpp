@@ -46,7 +46,7 @@ public:
      */
     double get_error(double (*exact_solution)(double, double)) const;
     void write_error_plot(double (*exact_solution)(double, double)) const;
-    void write_result() const;
+    void write_result(std::string const & path = ".") const;
 
 public:
     heat_equation() = delete;
