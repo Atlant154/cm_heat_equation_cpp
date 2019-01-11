@@ -1,7 +1,7 @@
 #include <iostream>
 #include <getopt.h>
 
-#include "libheateq/include/heat_equation.h"
+#include <heat_equation.h>
 
 double const diffusivity_coefficient = 0.020;
 std::string g_path = ".";

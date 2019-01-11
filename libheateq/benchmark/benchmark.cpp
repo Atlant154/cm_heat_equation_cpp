@@ -1,4 +1,4 @@
-#include "../include/heat_equation.h"
+#include <heat_equation.h>
 #include <benchmark/benchmark.h>
 
 double const diffusivity_coefficient = 0.020;
