@@ -15,9 +15,9 @@ public:
      * @param h_num - The number of spatial splits.
      * @param time_layers_num - The number of time layers.
     */
-    heat_equation(double (*heat_sources)(double, double),
-                  double (*exact_solution)(double, double),
-                  double diffusivity_coefficient,
+    heat_equation(double_t (*heat_sources)(double_t, double_t),
+                  double_t (*exact_solution)(double_t, double_t),
+                  double_t diffusivity_coefficient,
                   uint32_t h_num,
                   uint32_t time_layers_num);
     /*!
@@ -31,11 +31,11 @@ public:
      * @param h_num - The number of spatial splits.
      * @param time_layers_num - The number of time layers.
     */
-    heat_equation(double (*heat_sources)(double, double),
-                  double (*initial_time_layer)(double),
-                  double (*left_bound)(double),
-                  double (*right_bound)(double),
-                  double diffusivity_coefficient,
+    heat_equation(double_t (*heat_sources)(double_t, double_t),
+                  double_t (*initial_time_layer)(double_t),
+                  double_t (*left_bound)(double_t),
+                  double_t (*right_bound)(double_t),
+                  double_t diffusivity_coefficient,
                   uint32_t h_num,
                   uint32_t time_layers_num);
 
@@ -44,8 +44,8 @@ public:
      * @param exact_solution - The function of exact solution of PDE.
      * @return - The total error.
      */
-    double get_error(double (*exact_solution)(double, double)) const;
-    void write_error_plot(double (*exact_solution)(double, double), std::string const & path = ".") const;
+    double_t get_error(double_t (*exact_solution)(double_t, double_t)) const;
+    void write_error_plot(double_t (*exact_solution)(double_t, double_t), std::string const & path = ".") const;
     void write_result(std::string const & path = ".") const;
 
 public:
@@ -59,26 +59,26 @@ private:
      * @param free_part - F from Ax = F.
      * @param result - The result(x) vector.
      */
-    void modified_thomas_alg(std::vector<double> const & free_part, std::vector<double> & result);
+    void modified_thomas_alg(std::vector<double_t> const & free_part, std::vector<double_t> & result);
 
 private:
     //Time and space boundaries + diffusivity coefficient(a):
-    double const x_left_bound_ = 0.0;
-    double const x_right_bound_ = 1.0;
-    double const time_left_bound_ = 0.0;
-    double const time_right_bound_ = 1.0;
+    double_t const x_left_bound_ = 0.0;
+    double_t const x_right_bound_ = 1.0;
+    double_t const time_left_bound_ = 0.0;
+    double_t const time_right_bound_ = 1.0;
 
     //Unknown at compile time(define in constructor):
     uint32_t const h_num_;
     uint32_t const time_layers_num_;
-    double const a_;
+    double_t const a_;
 
     //Get the values during the initialization of
     //h_hum and time_layers_num.
-    double const h_;
-    double const tau_;
-    double const matrix_above_;
-    double const matrix_main_;
+    double_t const h_;
+    double_t const tau_;
+    double_t const matrix_above_;
+    double_t const matrix_main_;
 
-    std::vector<std::vector<double>> results_;
+    std::vector<std::vector<double_t>> results_;
 };

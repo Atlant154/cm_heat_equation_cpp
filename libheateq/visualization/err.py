@@ -48,6 +48,6 @@ fig.colorbar(surf, shrink=0.5, aspect=5)
 
 ax.set_xlabel('X')
 ax.set_ylabel('Time')
-ax.set_zlabel('Temperature')
+ax.set_zlabel('Error')
 
 plt.show()
