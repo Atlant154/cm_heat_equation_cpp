@@ -19,3 +19,14 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O2 -funroll-loops -ftree-vectorize")
 
 endif ()
+
+option(PACKAGE_TESTS "Build the tests" ON)
+if (PACKAGE_TESTS)
+
+    if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
+    endif ()
+
+    enable_testing()
+    add_subdirectory(tests)
+endif ()

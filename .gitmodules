@@ -1,3 +1,6 @@
 [submodule "libheateq/benchmark/google_benchmark"]
 	path = libheateq/benchmark/google_benchmark
 	url = https://github.com/google/benchmark.git
+[submodule "libheateq/tests/google_test"]
+	path = libheateq/tests/google_test
+	url = https://github.com/google/googletest.git

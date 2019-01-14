@@ -45,7 +45,7 @@ public:
      * @return - The total error.
      */
     double get_error(double (*exact_solution)(double, double)) const;
-    void write_error_plot(double (*exact_solution)(double, double)) const;
+    void write_error_plot(double (*exact_solution)(double, double), std::string const & path = ".") const;
     void write_result(std::string const & path = ".") const;
 
 public:

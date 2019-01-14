@@ -5,17 +5,17 @@
 
 double const diffusivity_coefficient = 0.020;
 
-std::string g_outputPath = "../result";
+std::string g_outputPath = ".";
 bool g_write = false;
 bool g_help = false;
 uint32_t g_tauNum = 0;
 uint32_t g_hNum = 0;
 
-double function_of_heat_sources(double x, double t) {
+inline double HeatSources(double x, double t) {
     return 2 * t - exp(x) + x - diffusivity_coefficient * ((-1) * t * exp(x) - 12 * pow(x, 2));
 }
 
-double function_of_exact_solution(double x, double t) {
+inline double ExactSolution(double x, double t) {
     return (-1) * pow(x, 4) + t * x + pow(t, 2) - t * exp(x);
 }
 
@@ -25,7 +25,7 @@ void show_usage()
         << '\n' << "-t --tau         [number]      [required] The number of time layers."
         << '\n' << "-s --splits      [number]      [required] The number of of spatial splits."
         << '\n' << "-w --write                     [optional] Write results to file."
-        << '\n' << "-o --output-path [path]        [optional] The output directory path, i.e. ~/projects/result. Default: ./."
+        << '\n' << "-o --output-path [path]        [optional] The output directory path, i.e. ~/projects/visualization. Default: ./."
         << '\n' << "-h --help                      [optional] Show this message."
         << '\n';
 }
@@ -74,15 +74,16 @@ int main(int argc, char ** argv) {
     }
 
     heat_equation
-            test_class_member(function_of_heat_sources, function_of_exact_solution, diffusivity_coefficient, g_hNum,
+            test_class_member(HeatSources, ExactSolution, diffusivity_coefficient, g_hNum,
                               g_tauNum);
 
-    double error = test_class_member.get_error(function_of_exact_solution);
+    double error = test_class_member.get_error(ExactSolution);
     std::cout << "Error resulting from the calculation: " << error << "." << std::endl;
+    std::cout << "Theoretical error: " << 1. / (g_hNum * g_hNum + g_tauNum) << "." << std::endl;
 
     if (g_write) {
         test_class_member.write_result(g_outputPath);
-        test_class_member.write_error_plot(function_of_exact_solution);
+        test_class_member.write_error_plot(ExactSolution, g_outputPath);
     }
 
     return EXIT_SUCCESS;
