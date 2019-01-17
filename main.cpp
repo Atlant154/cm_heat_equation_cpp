@@ -1,88 +1,44 @@
 #include <iostream>
-#include <getopt.h>
 
+#include <CLI/CLI.hpp>
 #include <heat_equation.h>
 
-double_t const diffusivity_coefficient = 0.020;
-
-std::string g_outputPath = ".";
-bool g_write = false;
-bool g_help = false;
-uint32_t g_tauNum = 0;
-uint32_t g_hNum = 0;
+double_t const diffusivity_coefficient{0.020};
 
 inline double_t HeatSources(double_t const x, double_t const t) {
-    return 2. * t - std::exp(x) + x - diffusivity_coefficient * ((-1.) * t * exp(x) - 12. * std::pow(x, 2.));
+    return 2. * t - std::exp(x) + x - diffusivity_coefficient * ((-1.) * t * std::exp(x) - 12. * std::pow(x, 2));
 }
 
 inline double_t ExactSolution(double_t const x, double_t const t) {
-    return (-1.) * std::pow(x, 4.) + t * x + std::pow(t, 2.) - t * std::exp(x);
+    return (-1.) * std::pow(x, 4) + t * x + std::pow(t, 2) - t * std::exp(x);
 }
 
-void show_usage()
-{
-    std::cout << "Heat equation tool keys usage:"
-        << '\n' << "-t --tau         [number]      [required] The number of time layers."
-        << '\n' << "-s --splits      [number]      [required] The number of of spatial splits."
-        << '\n' << "-w --write                     [optional] Write results to file."
-        << '\n' << "-o --output-path [path]        [optional] The output directory path, i.e. ~/projects/visualization. Default: ./."
-        << '\n' << "-h --help                      [optional] Show this message."
-        << '\n';
-}
+int32_t main(int32_t argc, char * argv[]) {
+    CLI::App application{"Application is an example of solving the heat equation"};
 
-bool parse_arguments(int argc, char ** argv) {
-    static struct option long_options[] =
-            {{"tau",         required_argument, nullptr, 't'},
-             {"splits",      required_argument, nullptr, 's'},
-             {"output-path", required_argument, nullptr, 'o'},
-             {"write",       no_argument,       nullptr, 'w'},
-             {"help",        no_argument,       nullptr, 'h'},
-             {nullptr,       0,                 nullptr, 0  }
-            };
+    uint32_t tau_num{0};
+    application.add_option("-t,--tau", tau_num, "The number of time layers")->required();
 
-    int32_t opt;
-    int32_t opt_index;
-    while ((opt = getopt_long(argc, argv, "t:s:o:h:w", long_options, &opt_index)) != -1) {
-        switch (opt) {
-            case 't': {
-                int64_t const tau_candidate = std::stoi(optarg);
-                g_tauNum = tau_candidate > 0 ? (uint32_t) tau_candidate : 0;
-            }
-                break;
-            case 's': {
-                int64_t const h_candidate = std::stoi(optarg);
-                g_hNum = h_candidate > 0 ? (uint32_t) h_candidate : 0;
-            }
-                break;
-            case 'w':
-                g_write = true;
-                break;
-            case 'h':
-                g_help = true;
-                break;
-            default:
-                g_help = true;
-        }
-    }
-    return g_hNum != 0 && g_tauNum != 0 && !g_help;
-}
+    uint32_t h_num{0};
+    application.add_option("-s,--splits", h_num, "The number of of spatial splits")->required();
 
-int main(int argc, char ** argv) {
-    if (!parse_arguments(argc, argv)) {
-        show_usage();
-        return EXIT_FAILURE;
-    }
+    bool write_to_file{false};
+    application.add_flag("-w,--write", write_to_file, "Write results to file");
 
-    heat_equation
-            test_class_member(HeatSources, ExactSolution, diffusivity_coefficient, g_hNum,
-                              g_tauNum);
+    std::string output_dir{"."};
+    application.add_option("-o,--output-path", output_dir,
+                           "The output directory path, i.e. ~/projects/visualization. Default: ./")->required(false);
 
-    double_t const error = test_class_member.get_error(ExactSolution);
+    CLI11_PARSE(application, argc, argv);
+
+    heat_equation hq(HeatSources, ExactSolution, diffusivity_coefficient, h_num, tau_num);
+
+    double_t const error = hq.get_error(ExactSolution);
     std::cout << "Error resulting from the calculation: " << error << "." << std::endl;
 
-    if (g_write) {
-        test_class_member.write_result(g_outputPath);
-        test_class_member.write_error_plot(ExactSolution, g_outputPath);
+    if (write_to_file) {
+        hq.write_result(output_dir);
+        hq.write_error_plot(ExactSolution, output_dir);
     }
 
     return EXIT_SUCCESS;

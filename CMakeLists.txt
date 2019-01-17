@@ -9,6 +9,9 @@ add_executable(cm_heat_equation ${sources})
 add_subdirectory(libheateq)
 target_link_libraries(cm_heat_equation heat_equation)
 
+add_subdirectory(CLI11)
+include_directories(CLI11/include)
+
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
