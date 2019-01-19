@@ -131,7 +131,7 @@ void heat_equation::modified_thomas_alg(std::vector<double_t> const & free_part,
 void heat_equation::write_result(std::string const & path) const
 {
     std::fstream result_file;
-    result_file.open(path + "/result.txt",
+    result_file.open(path + PATH_SEPARATOR + "result.txt",
                      std::ios::out | std::ios::trunc);
     result_file << "[[" << x_left_bound_ << "," << x_right_bound_ << ", " << h_num_ << "],"
                 << "[" << time_left_bound_ << "," << time_right_bound_ << ", " << time_layers_num_ << "],[";
@@ -152,9 +152,9 @@ void heat_equation::write_result(std::string const & path) const
 
 void heat_equation::write_error_plot(double_t (*exact_solution)(double_t, double_t), std::string const & path) const
 {
-    double error;
+    double_t error;
     std::fstream result_file;
-    result_file.open(path + "/error.txt", std::ios::out | std::ios::trunc);
+    result_file.open(path + PATH_SEPARATOR + "error.txt", std::ios::out | std::ios::trunc);
     result_file << "[[" << x_left_bound_ << "," << x_right_bound_ << ", " << h_num_ << "],"
                 << "[" << time_left_bound_ << "," << time_right_bound_ << ", " << time_layers_num_ << "],[";
     for (uint32_t time_iter = 0; time_iter < time_layers_num_; ++time_iter) {
@@ -174,7 +174,7 @@ void heat_equation::write_error_plot(double_t (*exact_solution)(double_t, double
     result_file.close();
 }
 
-double heat_equation::get_error(double_t (*exact_solution)(double_t, double_t)) const
+double_t heat_equation::get_error(double_t (*exact_solution)(double_t, double_t)) const
 {
     double_t error = 0.0;
 

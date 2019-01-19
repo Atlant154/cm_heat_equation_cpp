@@ -8,6 +8,7 @@ add_executable(cm_heat_equation ${sources})
 
 add_subdirectory(libheateq)
 target_link_libraries(cm_heat_equation heat_equation)
+enable_testing()
 
 add_subdirectory(CLI11)
 include_directories(CLI11/include)

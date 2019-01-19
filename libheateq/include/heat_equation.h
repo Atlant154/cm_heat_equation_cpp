@@ -5,6 +5,12 @@
 #include <cstdint>
 #include <fstream>
 
+#if defined(WIN32) || defined(_WIN32)
+#define PATH_SEPARATOR "\\"
+#else
+#define PATH_SEPARATOR "/"
+#endif
+
 class heat_equation {
 public:
     /*!
