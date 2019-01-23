@@ -10,6 +10,9 @@ target_include_directories(heat_equation PUBLIC
 
 add_subdirectory(benchmark)
 
+add_subdirectory(json)
+target_link_libraries(heat_equation nlohmann_json::nlohmann_json)
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -Wall -Wextra -pedantic -g -Wshadow -Wformat=2 -Wconversion \
@@ -17,6 +20,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         -D_FORTIFY_SOURCE=2 -fsanitize=undefined")
 
     set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O2 -funroll-loops -ftree-vectorize")
+
+    target_link_libraries(heat_equation stdc++fs)
 
 endif ()
 

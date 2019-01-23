@@ -4,12 +4,10 @@
 #include <vector>
 #include <cstdint>
 #include <fstream>
+#include <filesystem>
 
-#if defined(WIN32) || defined(_WIN32)
-#define PATH_SEPARATOR "\\"
-#else
-#define PATH_SEPARATOR "/"
-#endif
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 class heat_equation {
 public:
@@ -51,8 +49,10 @@ public:
      * @return - The total error.
      */
     double_t get_error(double_t (*exact_solution)(double_t, double_t)) const;
-    void write_error_plot(double_t (*exact_solution)(double_t, double_t), std::string const & path = ".") const;
+    void write_error(double_t (*exact_solution)(double_t, double_t), std::string const & path = ".") const;
+    void write_error_json(double_t (*exact_solution)(double_t, double_t), std::string const & path = ".") const;
     void write_result(std::string const & path = ".") const;
+    void write_result_json(std::string const & path = ".") const;
 
 public:
     heat_equation() = delete;
@@ -65,14 +65,16 @@ private:
      * @param free_part - F from Ax = F.
      * @param result - The result(x) vector.
      */
-    void modified_thomas_alg(std::vector<double_t> const & free_part, std::vector<double_t> & result);
+    void modified_thomas_alg(std::vector<double_t> const & free_part, std::vector<double_t> & result) const;
+    json method_json(std::string const & type) const;
+
 
 private:
     //Time and space boundaries + diffusivity coefficient(a):
-    double_t const x_left_bound_ = 0.0;
-    double_t const x_right_bound_ = 1.0;
-    double_t const time_left_bound_ = 0.0;
-    double_t const time_right_bound_ = 1.0;
+    double_t const x_left_bound_      {0.0};
+    double_t const x_right_bound_     {1.0};
+    double_t const time_left_bound_   {0.0};
+    double_t const time_right_bound_  {1.0};
 
     //Unknown at compile time(define in constructor):
     uint32_t const h_num_;

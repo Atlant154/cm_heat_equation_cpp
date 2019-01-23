@@ -10,6 +10,7 @@ add_subdirectory(libheateq)
 target_link_libraries(cm_heat_equation heat_equation)
 enable_testing()
 
+option(CLI11_TESTING "Build the tests and add them" OFF)
 add_subdirectory(CLI11)
 include_directories(CLI11/include)
 

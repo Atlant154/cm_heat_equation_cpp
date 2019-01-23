@@ -37,8 +37,8 @@ int32_t main(int32_t argc, char * argv[]) {
     std::cout << "Error resulting from the calculation: " << error << "." << std::endl;
 
     if (write_to_file) {
-        hq.write_result(output_dir);
-        hq.write_error_plot(ExactSolution, output_dir);
+        hq.write_result_json(output_dir);
+        hq.write_error_json(ExactSolution, output_dir);
     }
 
     return EXIT_SUCCESS;
