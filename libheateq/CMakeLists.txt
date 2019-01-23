@@ -10,6 +10,7 @@ target_include_directories(heat_equation PUBLIC
 
 add_subdirectory(benchmark)
 
+set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(json)
 target_link_libraries(heat_equation nlohmann_json::nlohmann_json)
 

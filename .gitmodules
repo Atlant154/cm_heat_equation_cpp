@@ -8,4 +8,5 @@
 	path = CLI11
 	url = https://github.com/CLIUtils/CLI11.git
 [submodule "libheateq/json"]
+	path = libheateq/json
 	url = https://github.com/nlohmann/json.git
