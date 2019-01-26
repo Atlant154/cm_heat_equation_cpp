@@ -23,7 +23,7 @@ script:
   - cd build
   - CXX=/usr/bin/g++-8 CC=/usr/bin/gcc-8
   - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DTARGET_CPU=$TARGET_CPU
-  - cmake --build .
+  - cmake --build . --parallel
   - ctest --parallel $(nproc) --build-config %CONFIGURATION% --output-on-failure
 
 notifications:

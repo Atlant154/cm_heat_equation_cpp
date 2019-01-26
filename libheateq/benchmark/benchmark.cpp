@@ -11,12 +11,29 @@ inline double_t ExactSolution(double_t const x, double_t const t) {
     return (-1.) * std::pow(x, 4) + t * x + std::pow(t, 2) - t * std::exp(x);
 }
 
-void h_equation(benchmark::State & state)
-{
+static void HeatEQ(benchmark::State &state) {
     for (auto _ : state)
-        heat_equation exmpl(HeatSources, ExactSolution, diffusivity_coefficient, state.range(0), 100);
+        heat_equation heq_eq(HeatSources, ExactSolution, diffusivity_coefficient, state.range(0), 100);
 }
 
-BENCHMARK(h_equation)->RangeMultiplier(2)->Range(128, 1024<<7);
+BENCHMARK(HeatEQ)->RangeMultiplier(2)->Range(128, 1024<<7);
+
+static void WriteJSON(benchmark::State & state){
+    heat_equation heat_eq(HeatSources, ExactSolution, diffusivity_coefficient, state.range(0), 100);
+    for(auto _ : state){
+        heat_eq.write_result_json();
+    }
+}
+
+BENCHMARK(WriteJSON)->Arg(256)->Arg(1024);
+
+static void Write(benchmark::State & state){
+    heat_equation heat_eq(HeatSources, ExactSolution, diffusivity_coefficient, state.range(0), 100);
+    for(auto _ : state){
+        heat_eq.write_result();
+    }
+}
+
+BENCHMARK(Write)->Arg(256)->Arg(1024);
 
 BENCHMARK_MAIN();
