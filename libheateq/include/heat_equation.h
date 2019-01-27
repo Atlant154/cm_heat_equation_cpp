@@ -49,6 +49,8 @@ public:
      * @return - The total error.
      */
     double_t get_error(double_t (*exact_solution)(double_t, double_t)) const;
+    void write_exact_solution(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
+    void write_exact_solution_json(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
     void write_error(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
     void write_error_json(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
     void write_result(std::filesystem::path const & path = ".") const;

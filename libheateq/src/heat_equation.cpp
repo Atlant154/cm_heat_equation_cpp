@@ -2,16 +2,16 @@
 
 heat_equation::heat_equation(double_t (*heat_sources)(double_t, double_t),
                              double_t (*exact_solution)(double_t, double_t),
-                             double_t diffusivity_coefficient,
-                             uint32_t h_num,
-                             uint32_t time_layers_num) :
+                             double_t const diffusivity_coefficient,
+                             uint32_t const h_num,
+                             uint32_t const time_layers_num) :
       h_num_(h_num + 1)
     , time_layers_num_(time_layers_num + 1)
     , a_(diffusivity_coefficient)
     , h_((x_right_bound_ - x_left_bound_) / h_num_)
     , tau_((time_right_bound_ - time_left_bound_) / time_layers_num_)
-    , matrix_above_((-a_ * tau_) / std::pow(h_, 2))
-    , matrix_main_(1.0 + 2.0 * a_ * tau_ / std::pow(h_, 2))
+    , matrix_above_((-a_ * tau_) / std::pow(h_, 2.))
+    , matrix_main_(1. + 2. * a_ * tau_ / std::pow(h_, 2.))
 {
     std::vector<double_t> time_layer, ta_free_part, ta_result(h_num_ - 2);
     time_layer.reserve(time_layers_num_);
@@ -56,16 +56,16 @@ heat_equation::heat_equation(double_t (*heat_sources)(double_t, double_t),
                              double_t (*initial_time_layer)(double_t),
                              double_t (*left_bound)(double_t),
                              double_t (*right_bound)(double_t),
-                             double_t diffusivity_coefficient,
-                             uint32_t h_num,
-                             uint32_t time_layers_num) :
+                             double_t const diffusivity_coefficient,
+                             uint32_t const h_num,
+                             uint32_t const time_layers_num) :
       h_num_(h_num)
     , time_layers_num_(time_layers_num)
     , a_(diffusivity_coefficient)
     , h_((x_right_bound_ - x_left_bound_) / h_num_)
     , tau_((time_right_bound_ - time_left_bound_) / time_layers_num_)
-    , matrix_above_((-a_ * tau_) / std::pow(h_, 2))
-    , matrix_main_(1.0 + 2.0 * a_ * tau_ / std::pow(h_, 2))
+    , matrix_above_((-a_ * tau_) / std::pow(h_, 2.))
+    , matrix_main_(1.0 + 2.0 * a_ * tau_ / std::pow(h_, 2.))
 {
     std::vector<double_t> time_layer, ta_free_part, ta_result(h_num_ - 2);
     time_layer.reserve(time_layers_num_);
@@ -117,7 +117,7 @@ void heat_equation::modified_thomas_alg(std::vector<double_t> const & free_part,
     beta[n - 2] = free_part.back() / matrix_main_;
 
     for (auto iter{n - 2}; iter > 0; --iter) {
-        common_factor = 1.0 / (matrix_main_ + matrix_above_ * alpha[iter]);
+        common_factor = 1. / (matrix_main_ + matrix_above_ * alpha[iter]);
         alpha[iter - 1] = -matrix_above_ * common_factor;
         beta[iter - 1] = (free_part[iter] - beta[iter] * matrix_above_) * common_factor;
     }
@@ -138,8 +138,27 @@ std::ofstream heat_equation::method_write(std::filesystem::path const & path, st
     return result_file;
 }
 
+void heat_equation::write_exact_solution(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path) const {
+    std::ofstream result_file = this->method_write(path, "result");
+
+    for (uint32_t time_iter{0}; time_iter < time_layers_num_; ++time_iter) {
+        result_file << "[";
+        for (uint32_t space_iter{0}; space_iter < h_num_; ++space_iter) {
+            result_file << exact_solution(x_left_bound_ + h_num_ * space_iter, time_left_bound_ + tau_ * time_iter);
+            if (space_iter + 1 != h_num_)
+                result_file << ",";
+        }
+        result_file << "]";
+        if (time_iter + 1 != time_layers_num_)
+            result_file << ",";
+    }
+    result_file << "]]\n";
+
+    result_file.close();
+}
+
 void heat_equation::write_result(std::filesystem::path const & path) const {
-    std::ofstream result_file = method_write(path, "result");
+    std::ofstream result_file = this->method_write(path, "result");
 
     std::function const write_time_layer = [&](std::vector<double_t> time_layer) {
         result_file << "[";
@@ -157,7 +176,7 @@ void heat_equation::write_result(std::filesystem::path const & path) const {
 
 void heat_equation::write_error(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path) const {
     double_t error;
-    std::ofstream result_file = method_write(path, "error");
+    std::ofstream result_file = this->method_write(path, "error");
 
     for (uint32_t time_iter{0}; time_iter < time_layers_num_; ++time_iter) {
         result_file << "[";
@@ -194,9 +213,31 @@ json heat_equation::method_json(std::string const & type) const {
     return result_json;
 }
 
+void heat_equation::write_exact_solution_json(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path) const {
+    std::string const type = "exact";
+    json result_json = this->method_json(type);
+
+    std::ofstream result_file;
+    result_file.open(path / ("visualization_" + type + ".txt"), std::ios::trunc);
+
+    std::vector<std::vector<double_t>> exact_solutions;
+    std::vector<double_t> time_layer(h_num_);
+
+    for(uint32_t time_iter{0}; time_iter < time_layers_num_; ++time_iter) {
+        for(uint32_t space_iter{0}; space_iter < h_num_; ++space_iter)
+            time_layer[space_iter] = exact_solution(x_left_bound_ + h_ * space_iter, time_left_bound_ + tau_ * time_iter);
+        exact_solutions.emplace_back(time_layer);
+    }
+
+    result_json["result"] = exact_solutions;
+    result_file << result_json;
+    result_file.close();
+
+}
+
 void heat_equation::write_result_json(std::filesystem::path const & path) const {
     std::string const type = "result";
-    json result_json = method_json(type);
+    json result_json = this->method_json(type);
     result_json["result"] = results_;
 
     std::ofstream result_file;
@@ -208,7 +249,7 @@ void heat_equation::write_result_json(std::filesystem::path const & path) const 
 
 void heat_equation::write_error_json(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path) const {
     std::string const type = "error";
-    json result_json = method_json(type);
+    json result_json = this->method_json(type);
 
     std::ofstream result_file;
     result_file.open(path / ("visualization_" + type + ".txt"), std::ios::trunc);
@@ -232,14 +273,14 @@ void heat_equation::write_error_json(double_t (*exact_solution)(double_t, double
 }
 
 double_t heat_equation::get_error(double_t (*exact_solution)(double_t, double_t)) const {
-    double_t error{0.0};
+    double_t error{0.};
     double_t exact, appr;
 
     for (uint32_t time_iter{1}; time_iter < time_layers_num_; ++time_iter)
         for (uint32_t space_iter{1}; space_iter < h_num_ - 1; ++space_iter) {
             exact = exact_solution(x_left_bound_ + space_iter * h_, time_left_bound_ + time_iter * tau_);
             appr = results_[time_iter][space_iter];
-            error += std::pow(exact - appr, 2.0);
+            error += std::pow(exact - appr, 2.);
         }
     return std::sqrt(error * h_ * tau_);
 }

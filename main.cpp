@@ -7,9 +7,9 @@ double_t constexpr diffusivity_coefficient{0.010417};
 
 inline double_t HeatSources(double_t const x, double_t const t) {
     return std::pow(x, 2.) * (std::pow(x, 2.)
-                              - 12 * diffusivity_coefficient * t)
-                              + std::exp(x) * (x * t * (diffusivity_coefficient * t - 2)
-                              + diffusivity_coefficient * std::pow(t, 2.) + 2 * t);
+                              - 12. * diffusivity_coefficient * t)
+                              + std::exp(x) * (x * t * (diffusivity_coefficient * t - 2.)
+                              + diffusivity_coefficient * std::pow(t, 2.) + 2. * t);
 }
 
 inline double_t ExactSolution(double_t const x, double_t const t) {
@@ -42,6 +42,7 @@ int32_t main(int32_t argc, char * argv[]) {
     if (write_to_file) {
         hq.write_result_json(output_dir);
         hq.write_error_json(ExactSolution, output_dir);
+        hq.write_exact_solution_json(ExactSolution, output_dir);
     }
 
     return EXIT_SUCCESS;
