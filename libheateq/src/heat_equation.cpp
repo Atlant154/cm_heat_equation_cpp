@@ -21,21 +21,21 @@ heat_equation::heat_equation(double_t (*heat_sources)(double_t, double_t),
     results_.clear();
     results_.reserve(time_layers_num_);
 
-    for (uint32_t iter = 0; iter < h_num_; ++iter)
+    for (uint32_t iter{0}; iter < h_num_; ++iter)
         time_layer.emplace_back(exact_solution(x_left_bound_ + iter * h_, time_left_bound_));
 
     results_.emplace_back(time_layer);
 
     double_t const courant_number = (a_ * tau_) / std::pow(h_, 2.);
 
-    for (uint32_t time_iter = 1; time_iter < time_layers_num_; ++time_iter) {
-        for (uint32_t space_iter = 1; space_iter < h_num_ - 1; ++space_iter)
+    for (uint32_t time_iter{1}; time_iter < time_layers_num_; ++time_iter) {
+        for (uint32_t space_iter{1}; space_iter < h_num_ - 1; ++space_iter)
             ta_free_part.emplace_back(
                     time_layer[space_iter]
-                    + tau_ * heat_sources(x_left_bound_ + space_iter * h_, time_left_bound_ + time_iter * tau_));
+                    + tau_ * heat_sources(x_left_bound_ + space_iter * h_, time_left_bound_ + (time_iter - 1) * tau_));
 
-        double_t const left_bound = exact_solution(x_left_bound_, time_left_bound_ + time_iter * tau_);
-        double_t const right_bound = exact_solution(x_right_bound_, time_left_bound_ + time_iter * tau_);
+        double_t const left_bound  {exact_solution(x_left_bound_,  time_left_bound_ + time_iter * tau_)};
+        double_t const right_bound {exact_solution(x_right_bound_, time_left_bound_ + time_iter * tau_)};
 
         ta_free_part.front() += courant_number * left_bound;
         ta_free_part.back() += courant_number * right_bound;
@@ -75,19 +75,19 @@ heat_equation::heat_equation(double_t (*heat_sources)(double_t, double_t),
     results_.clear();
     results_.reserve(time_layers_num_);
 
-    for (uint32_t iter = 0; iter < h_num_; ++iter)
+    for (uint32_t iter{0}; iter < h_num_; ++iter)
         time_layer.emplace_back(initial_time_layer(x_left_bound_ + iter * h_));
 
     results_.emplace_back(time_layer);
 
     double_t const courant_number = (a_ * tau_) / std::pow(h_, 2.);
 
-    for (uint32_t time_iter = 1; time_iter < time_layers_num_; ++time_iter)
+    for (uint32_t time_iter{1}; time_iter < time_layers_num_; ++time_iter)
     {
-        for (uint32_t space_iter = 1; space_iter < h_num_ - 1; ++space_iter)
+        for (uint32_t space_iter{1}; space_iter < h_num_ - 1; ++space_iter)
             ta_free_part.emplace_back(
                 time_layer[space_iter]
-                    + tau_ * heat_sources(x_left_bound_ + space_iter * h_, time_left_bound_ + time_iter * tau_));
+                    + tau_ * heat_sources(x_left_bound_ + space_iter * h_, time_left_bound_ + (time_iter - 1) * tau_));
 
         double_t const left_bound_val = left_bound(time_left_bound_ + time_iter * tau_);
         double_t const right_bound_val = right_bound(time_left_bound_ + time_iter * tau_);
@@ -108,7 +108,7 @@ heat_equation::heat_equation(double_t (*heat_sources)(double_t, double_t),
 }
 
 void heat_equation::modified_thomas_alg(std::vector<double_t> const & free_part, std::vector<double_t> & result) const {
-    std::size_t n = result.size();
+    std::size_t n = free_part.size();
     std::vector<double_t> alpha(n - 1), beta(n - 1);
 
     double_t common_factor;
@@ -116,7 +116,7 @@ void heat_equation::modified_thomas_alg(std::vector<double_t> const & free_part,
     alpha[n - 2] = -matrix_above_ / matrix_main_;
     beta[n - 2] = free_part.back() / matrix_main_;
 
-    for (auto iter = n - 2; iter > 0; --iter) {
+    for (auto iter{n - 2}; iter > 0; --iter) {
         common_factor = 1.0 / (matrix_main_ + matrix_above_ * alpha[iter]);
         alpha[iter - 1] = -matrix_above_ * common_factor;
         beta[iter - 1] = (free_part[iter] - beta[iter] * matrix_above_) * common_factor;
@@ -124,43 +124,44 @@ void heat_equation::modified_thomas_alg(std::vector<double_t> const & free_part,
 
     result[0] = (free_part[0] - matrix_above_ * beta[0]) / (matrix_main_ + matrix_above_ * alpha[0]);
 
-    for (std::size_t iter = 1; iter < n; ++iter)
+    for (std::size_t iter{1}; iter < n; ++iter)
         result[iter] = alpha[iter - 1] * result[iter - 1] + beta[iter - 1];
 }
 
-void heat_equation::write_result(std::string const & path) const
-{
+std::ofstream heat_equation::method_write(std::filesystem::path const & path, std::string const & type) const {
     std::ofstream result_file;
-    result_file.open(std::filesystem::path(path) / "result.txt", std::ios::trunc);
+    result_file.open(path / (type + ".txt"), std::ios::trunc);
 
-    result_file << "[[" << x_left_bound_ << "," << x_right_bound_ << ", " << h_num_ << "],"
-                << "[" << time_left_bound_ << "," << time_right_bound_ << ", " << time_layers_num_ << "],[";
-    for (uint32_t time_iter = 0; time_iter < time_layers_num_; ++time_iter) {
+    result_file << "[[" << x_left_bound_ << "," << x_right_bound_ << "," << h_num_ << "],"
+                << "[" << time_left_bound_ << "," << time_right_bound_ << "," << time_layers_num_ << "],[";
+
+    return result_file;
+}
+
+void heat_equation::write_result(std::filesystem::path const & path) const {
+    std::ofstream result_file = method_write(path, "result");
+
+    std::function const write_time_layer = [&](std::vector<double_t> time_layer) {
         result_file << "[";
-        for (uint32_t space_iter = 0; space_iter < h_num_; ++space_iter) {
-            result_file << results_[time_iter][space_iter];
-            if (space_iter + 1 != h_num_)
-                result_file << ",";
-        }
-        result_file << "]";
-        if (time_iter + 1 != time_layers_num_)
-            result_file << ",";
-    }
-    result_file << "]]\n";
+        std::copy(time_layer.begin(), time_layer.end() - 1, std::ostream_iterator<double_t>(result_file, ","));
+        result_file << time_layer.back() << "],"; };
+
+    std::for_each(results_.begin(), results_.end() - 1, write_time_layer);
+
+    result_file << "[";
+    std::copy(results_.back().begin(), results_.back().end() - 1, std::ostream_iterator<double_t>(result_file, ","));
+    result_file << results_.back().back() << "]]\n";
+
     result_file.close();
 }
 
-void heat_equation::write_error(double_t (*exact_solution)(double_t, double_t), std::string const & path) const
-{
+void heat_equation::write_error(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path) const {
     double_t error;
-    std::ofstream result_file;
-    result_file.open(std::filesystem::path(path) / "error.txt", std::ios::trunc);
+    std::ofstream result_file = method_write(path, "error");
 
-    result_file << "[[" << x_left_bound_ << "," << x_right_bound_ << ", " << h_num_ << "],"
-                << "[" << time_left_bound_ << "," << time_right_bound_ << ", " << time_layers_num_ << "],[";
-    for (uint32_t time_iter = 0; time_iter < time_layers_num_; ++time_iter) {
+    for (uint32_t time_iter{0}; time_iter < time_layers_num_; ++time_iter) {
         result_file << "[";
-        for (uint32_t space_iter = 0; space_iter < h_num_; ++space_iter) {
+        for (uint32_t space_iter{0}; space_iter < h_num_; ++space_iter) {
             error = std::abs(exact_solution(x_left_bound_ + space_iter * h_, time_left_bound_ + time_iter * tau_) -
                              results_[time_iter][space_iter]);
             result_file << error;
@@ -193,31 +194,31 @@ json heat_equation::method_json(std::string const & type) const {
     return result_json;
 }
 
-void heat_equation::write_result_json(std::string const & path) const {
+void heat_equation::write_result_json(std::filesystem::path const & path) const {
     std::string const type = "result";
     json result_json = method_json(type);
     result_json["result"] = results_;
 
     std::ofstream result_file;
-    result_file.open(std::filesystem::path(path) / ("visualization_" + type + ".txt"), std::ios::trunc);
+    result_file.open(path / ("visualization_" + type + ".txt"), std::ios::trunc);
 
     result_file << result_json;
     result_file.close();
 }
 
-void heat_equation::write_error_json(double_t (*exact_solution)(double_t, double_t), std::string const & path) const {
+void heat_equation::write_error_json(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path) const {
     std::string const type = "error";
     json result_json = method_json(type);
 
     std::ofstream result_file;
-    result_file.open(std::filesystem::path(path) / ("visualization_" + type + ".txt"), std::ios::trunc);
+    result_file.open(path / ("visualization_" + type + ".txt"), std::ios::trunc);
 
     std::vector<std::vector<double_t>> errors;
     std::vector<double_t> tl_error(h_num_);
     double_t error;
 
-    for (uint32_t time_iter = 0; time_iter < time_layers_num_; ++time_iter) {
-        for (uint32_t space_iter = 0; space_iter < h_num_; ++space_iter) {
+    for (uint32_t time_iter{0}; time_iter < time_layers_num_; ++time_iter) {
+        for (uint32_t space_iter{0}; space_iter < h_num_; ++space_iter) {
             error = std::abs(exact_solution(x_left_bound_ + space_iter * h_, time_left_bound_ + time_iter * tau_) -
                              results_[time_iter][space_iter]);
             tl_error[space_iter] = error;
@@ -231,13 +232,14 @@ void heat_equation::write_error_json(double_t (*exact_solution)(double_t, double
 }
 
 double_t heat_equation::get_error(double_t (*exact_solution)(double_t, double_t)) const {
-    double_t error = 0.0;
+    double_t error{0.0};
+    double_t exact, appr;
 
-    for (uint32_t time_iter = 1; time_iter < time_layers_num_; ++time_iter)
-        for (uint32_t space_iter = 1; space_iter < h_num_ - 1; ++space_iter)
-            error += std::abs(results_[time_iter][space_iter] -
-                              exact_solution(x_left_bound_ + space_iter * h_, time_left_bound_ + time_iter * tau_)) *
-                                      tau_ * h_;
-
-    return error - std::numeric_limits<double_t>::epsilon() * h_num_ * time_layers_num_;
+    for (uint32_t time_iter{1}; time_iter < time_layers_num_; ++time_iter)
+        for (uint32_t space_iter{1}; space_iter < h_num_ - 1; ++space_iter) {
+            exact = exact_solution(x_left_bound_ + space_iter * h_, time_left_bound_ + time_iter * tau_);
+            appr = results_[time_iter][space_iter];
+            error += std::pow(exact - appr, 2.0);
+        }
+    return std::sqrt(error * h_ * tau_);
 }

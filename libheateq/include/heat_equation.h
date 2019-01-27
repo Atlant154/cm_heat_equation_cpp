@@ -31,7 +31,7 @@ public:
      * @param initial_time_layer - The initial time layer function. Boundary condition.
      * @param left_bound - The left boundary condition.
      * @param right_bound - The right boundary condition.
-     * @param diffusivity_coefficient - Diffusivity coefficient of the heat eaquation.
+     * @param diffusivity_coefficient - Diffusivity coefficient of the heat equation.
      * @param h_num - The number of spatial splits.
      * @param time_layers_num - The number of time layers.
     */
@@ -49,10 +49,10 @@ public:
      * @return - The total error.
      */
     double_t get_error(double_t (*exact_solution)(double_t, double_t)) const;
-    void write_error(double_t (*exact_solution)(double_t, double_t), std::string const & path = ".") const;
-    void write_error_json(double_t (*exact_solution)(double_t, double_t), std::string const & path = ".") const;
-    void write_result(std::string const & path = ".") const;
-    void write_result_json(std::string const & path = ".") const;
+    void write_error(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
+    void write_error_json(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
+    void write_result(std::filesystem::path const & path = ".") const;
+    void write_result_json(std::filesystem::path const & path = ".") const;
 
 public:
     heat_equation() = delete;
@@ -66,8 +66,8 @@ private:
      * @param result - The result(x) vector.
      */
     void modified_thomas_alg(std::vector<double_t> const & free_part, std::vector<double_t> & result) const;
+    std::ofstream method_write(std::filesystem::path const & path, std::string const & type) const;
     json method_json(std::string const & type) const;
-
 
 private:
     //Time and space boundaries + diffusivity coefficient(a):

@@ -3,14 +3,17 @@
 #include <CLI/CLI.hpp>
 #include <heat_equation.h>
 
-double_t const diffusivity_coefficient{0.020};
+double_t constexpr diffusivity_coefficient{0.010417};
 
 inline double_t HeatSources(double_t const x, double_t const t) {
-    return 2. * t - std::exp(x) + x - diffusivity_coefficient * ((-1.) * t * std::exp(x) - 12. * std::pow(x, 2));
+    return std::pow(x, 2.) * (std::pow(x, 2.)
+                              - 12 * diffusivity_coefficient * t)
+                              + std::exp(x) * (x * t * (diffusivity_coefficient * t - 2)
+                              + diffusivity_coefficient * std::pow(t, 2.) + 2 * t);
 }
 
 inline double_t ExactSolution(double_t const x, double_t const t) {
-    return (-1.) * std::pow(x, 4) + t * x + std::pow(t, 2) - t * std::exp(x);
+    return t * std::pow(x, 4.) - std::pow(t, 2.) * std::exp(x) * (x - 1.) + 1.;
 }
 
 int32_t main(int32_t argc, char * argv[]) {
