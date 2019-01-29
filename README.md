@@ -1,73 +1,96 @@
-# Heat equation. C++ implementation.
+# Уравнение теплопроводности. Heat equation. C++.
 
 ![Logo](docs/logo.jpg)
 
-## Table of content
+## Build status
 
-- [Heat equation. C++ implementation.](#heat-equation-c---implementation)
-  * [Problem](#problem)
-  * [Requirements](#requirements)
-  * [How to start](#how-to-start)
-  * [Visualization](#visualization)
-  * [Solution and hacks](#solution-and-hacks)
-    + [Thomas Algorithm](#thomas-algorithm)
-    + [Finding solution](#finding-solution)
-  * [Benchmarks](#benchmarks)
-  * [Calculation error](#calculation-error)
+[![Build Status](https://travis-ci.org/Atlant154/cm_heat_equation_cpp.svg?branch=master)](https://travis-ci.org/Atlant154/cm_heat_equation_cpp)
 
 ## Problem
 
-We need to solve a [partial differential equation](https://en.wikipedia.org/wiki/Partial_differential_equation) of [heat equation](https://en.wikipedia.org/wiki/Heat_equation) using [implicit Euler method](https://en.wikipedia.org/wiki/Backward_Euler_method).  
+Нужно было решить [PDE(уравнение в частных производных)](https://en.wikipedia.org/wiki/Partial_differential_equation) [heat equation(уравнения теплопроводности)](https://en.wikipedia.org/wiki/Heat_equation) исользуя [implicit Euler method(неявный метод Эйлера)](https://en.wikipedia.org/wiki/Backward_Euler_method).  
+Для решения была написана библиотека `heateq`, а также приложение, которое позволяет её использовать. 
 
 ## Requirements
 
 * [CMake](https://cmake.org/) v3.10 performance guaranteed.
-* [G++ compiler](https://gcc.gnu.org/) v7.3 performance guaranteed.
+* [G++ compiler](https://gcc.gnu.org/) v8.2 performance guaranteed.
 * [Python](https://www.python.org/) 3* with installed [matplotlib](https://matplotlib.org/) for visualization.
 
 ## How to start
 
-1. Clone repo: `git clone https://github.com/Atlant154/cm_heat_equation_cpp.git`
-2. Move to directory: `cd cm_heat_equation_cpp`
-3. Build the project: `cmake -DCMAKE_BUILD_TYPE=Release .. && make`
-4. Run the program: `./cm_heat_equation_cpp`
+1. Клонировать репозиторий с сабмодулями: `git clone --recurse-submodules https://github.com/Atlant154/cm_heat_equation_cpp.git`
+2. Переместится в директорию приложения: `cd cm_heat_equation_cpp`
+3. Создать директорию для сборки: `mkdir build && cd build`
+3. Собрать проект: `cmake -DCMAKE_BUILD_TYPE=Release .. && make`
+4. Запустить программу: `./cm_heat_equation_cpp --tau 1500 --splits 1500 --write`
+
+Программа имеет следующие флаги/опции запуска:
+
+```
+  -h,--help                   Print this help message and exit  
+  -t,--tau UINT REQUIRED      The number of time layers  
+  -s,--splits UINT REQUIRED   The number of of spatial splits  
+  -w,--write                  Write results to file  
+  -o,--output-path TEXT       The output directory path, i.e. ~/projects/visualization. Default: ./
+```
 
 ## Visualization
 
-After running the program in the `./result` directory, the `result.txt` file is generated.  
-To visualize the data obtained during the execution of the program, do the following command: `cd results && python3 vizualization.py`
+После выполнения программы с `write`-флагом, в указанной директории появится файлы требуемые для визуализации. Построить графики приближенного решения, ошибки и точного решения можно запустив
+скрипт `heateq/visualization/visualization.py` в директории с сохранёнными файлами: `python3 visualization.py` 
 
 ![Visualization](docs/vis.png)
-
-Also in the `./result` directory there is a `check.py` script, which is easily configured to get an image of the exact solution,
-if there is one.
 
 ## Solution and hacks
 
 ### Thomas Algorithm
 
-To solve three-diagonal matrix that appears during the solution, the
-[Thomas Algorithm](https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm) is traditionally used.
-At my decision applies a modified version of the algorithm, as the diagonal of the matrix composed of
-the same elements, as well upper and lower diagonal coincide.  
-This change gives a significant performance boost, but you will not able to use this implementation
-in other projects.
+Для решения трёхдиагональной матрицы, получаемой в ходе решения, обычно используется
+[Thomas Algorithm(алгоритм прогонки)](https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm).
+При решении конкретно этой задачи мы получаем трёхдиагональную матрицу специального вида: 
+элементы верхней и нижней диагонали равны одному значению, потому для наиболее эффективного использования
+использовался видоизменённый алгоритм прогонки:  
+```C++
+void HeatEquation::ModifiedThomasAlg(std::vector<double_t> const & free_part, std::vector<double_t> & result) const noexcept {
+    assert(free_part.size() == result.size());
+    std::size_t const n = free_part.size();
+    std::vector<double_t> alpha(n - 1), beta(n - 1);
+
+    double_t common_factor;
+
+    alpha[n - 2] = -matrix_above_ / matrix_main_;
+    beta[n - 2] = free_part.back() / matrix_main_;
+
+    for (auto iter {n - 2}; iter > 0; --iter) {
+        common_factor   = 1. / (matrix_main_ + matrix_above_ * alpha[iter]);
+        alpha[iter - 1] = -matrix_above_ * common_factor;
+        beta[iter - 1]  = (free_part[iter] - beta[iter] * matrix_above_) * common_factor;
+    }
+
+    result[0] = (free_part[0] - matrix_above_ * beta[0]) / (matrix_main_ + matrix_above_ * alpha[0]);
+
+    for (std::size_t iter{1}; iter < n; ++iter)
+        result[iter] = alpha[iter - 1] * result[iter - 1] + beta[iter - 1];
+}
+```
+Такое изменение даёт существенный прирост производительности, но использовать этот алгоритм в других задачах не представляется возможным.
 
 ### Finding solution
 
-To store the solution before writing to the file, cpp vectors are used. This approach is slower than
-raw arrays, but not much(less than 10%).
+Для хранения временных результатов и решения используется `std::vector`. Я постарался максимально оптимизировать работу с данными, потому просадка должна быть не более нескольких процентов в сравнении
+с сырыми указателями.
 
 ## Benchmarks
 
-All results were obtained by running benchmark of 10'000 times. The benchmark consisted of creating object + calculating an approximate solution. The problem was considered with hundred of time layers.
+Тестовые результаты получены при помощи google-benchmark при сотне временных слоёв.
 
 |      Splits:      |     128    |     512    | 1'024      | 8'192      | 32'768    | 131'072   |
 |:-----------------:|:----------:|:----------:|------------|------------|-----------|-----------|
-| Cpp(unoptimized): | 604.942 μs | 2307.75 μs | 4226.58 μs | 34498.1 μs | 143869 μs | 579175 μs |
+| Cpp(unoptimized): | 361.917 μs | 1439.70 μs | 2897.31 μs | 23783.5 μs | 94867  μs | 386435 μs |
 
-Configuration of the system on which the testing was conducted: Intel I7-6700 + 16GB RAM.
+Процессор: I7-6700.
 
 ## Calculation error
 
-Calculation error is calculated as: ![error](docs/error.png). You can verify this using `get_error()` and `get_max_error()` methods.
+Скорость аппроксимации: ![error](docs/error.png). Тесты скорости можно найти в `heateq/tests`, для проведения тестирования был использован google-test.

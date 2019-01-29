@@ -1,0 +1,32 @@
+dist: xenial
+sudo: false
+
+language: c++
+os: linux
+
+compiler:
+  - gcc
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-8
+
+env:
+  - TARGET_CPU=amd64 BUILD_CONFIGURATION=Release
+  - TARGET_CPU=x86 BUILD_CONFIGURATION=Release
+
+script:
+  - mkdir build
+  - cd build
+  - CXX=/usr/bin/g++-8 CC=/usr/bin/gcc-8
+  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_CONFIGURATION -DTARGET_CPU=$TARGET_CPU
+  - cmake --build . --parallel
+  - ctest --parallel $(nproc) --build-config %CONFIGURATION% --output-on-failure
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always

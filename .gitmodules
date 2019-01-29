@@ -1,0 +1,12 @@
+[submodule "CLI11"]
+	path = CLI11
+	url = https://github.com/CLIUtils/CLI11.git
+[submodule "heateq/json"]
+	path = heateq/json
+	url = https://github.com/nlohmann/json.git
+[submodule "heateq/benchmark/google_benchmark"]
+	path = heateq/benchmark/google_benchmark
+	url = https://github.com/google/benchmark.git
+[submodule "heateq/tests/google_test"]
+	path = heateq/tests/google_test
+	url = https://github.com/google/googletest.git

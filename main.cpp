@@ -1,39 +1,49 @@
 #include <iostream>
 
-#include "include/heat_equation.h"
+#include <CLI/CLI.hpp>
+#include <HeatEquation.hpp>
 
-int main() {
-    unsigned int h_num = 0;
+double_t constexpr diffusivity_coefficient{0.010417};
 
-    while (true) {
-        std::cout << "Hi. Enter here the number of partitions of the object:" << std::endl;
-        std::cin >> h_num;
-        if (h_num > 0)
-            break;
-    }
-    unsigned int time_layers_num = 0;
+inline double_t HeatSources(double_t const x, double_t const t) noexcept {
+    return std::pow(x, 2.) * (std::pow(x, 2.)
+                              - 12. * diffusivity_coefficient * t)
+                              + std::exp(x) * (x * t * (diffusivity_coefficient * t - 2.)
+                              + diffusivity_coefficient * std::pow(t, 2.) + 2. * t);
+}
 
-    while (true) {
-        std::cout << "Put number of time layers here:" << std::endl;
-        std::cin >> time_layers_num;
-        if (time_layers_num > 0)
-            break;
-    }
+inline double_t ExactSolution(double_t const x, double_t const t) noexcept {
+    return t * std::pow(x, 4.) - std::pow(t, 2.) * std::exp(x) * (x - 1.) + 1.;
+}
 
-    heat_equation test_class_member(h_num, time_layers_num);
-    test_class_member.get_result();
-    test_class_member.write_result();
+int32_t main(int32_t argc, char * argv[]) {
+    CLI::App application{"Application is an example of solving the heat equation"};
 
-    double error = test_class_member.get_error();
-    double theoretical_error = test_class_member.get_max_error();
+    uint32_t tau_num{0};
+    application.add_option("-t,--tau", tau_num, "The number of time layers")->required();
 
+    uint32_t h_num{0};
+    application.add_option("-s,--splits", h_num, "The number of of spatial splits")->required();
+
+    bool write_to_file{false};
+    application.add_flag("-w,--write", write_to_file, "Write results to file");
+
+    std::string output_dir{"."};
+    application.add_option("-o,--output-path", output_dir,
+                           "The output directory path, i.e. ~/projects/visualization. Default: ./")->required(false);
+
+    CLI11_PARSE(application, argc, argv);
+
+    HeatEquation hq(HeatSources, ExactSolution, diffusivity_coefficient, h_num, tau_num);
+
+    double_t const error = hq.GetError(ExactSolution);
     std::cout << "Error resulting from the calculation: " << error << "." << std::endl;
-    std::cout << "Theoretical error: " << theoretical_error << ". " << std::endl;
 
-    if (error < theoretical_error)
-        std::cout << "[Success] Real error less than theoretical!" << std::endl;
-    else
-        std::cout << "[Warning] Real error greater than theoretical!" << std::endl;
+    if (write_to_file) {
+        hq.WriteResultJSON(output_dir);
+        hq.WriteErrorJSON(ExactSolution, output_dir);
+        hq.WriteExactSolutionJSON(ExactSolution, output_dir);
+    }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
