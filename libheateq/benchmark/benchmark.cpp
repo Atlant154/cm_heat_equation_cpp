@@ -1,4 +1,4 @@
-#include <heat_equation.h>
+#include <heat_equation.hpp>
 #include <benchmark/benchmark.h>
 
 double_t constexpr diffusivity_coefficient{0.010417};
