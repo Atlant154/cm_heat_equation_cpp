@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <CLI/CLI.hpp>
-#include <heat_equation.hpp>
+#include <HeatEquation.hpp>
 
 double_t constexpr diffusivity_coefficient{0.010417};
 
@@ -34,15 +34,15 @@ int32_t main(int32_t argc, char * argv[]) {
 
     CLI11_PARSE(application, argc, argv);
 
-    heat_equation hq(HeatSources, ExactSolution, diffusivity_coefficient, h_num, tau_num);
+    HeatEquation hq(HeatSources, ExactSolution, diffusivity_coefficient, h_num, tau_num);
 
-    double_t const error = hq.get_error(ExactSolution);
+    double_t const error = hq.GetError(ExactSolution);
     std::cout << "Error resulting from the calculation: " << error << "." << std::endl;
 
     if (write_to_file) {
-        hq.write_result_json(output_dir);
-        hq.write_error_json(ExactSolution, output_dir);
-        hq.write_exact_solution_json(ExactSolution, output_dir);
+        hq.WriteResultJSON(output_dir);
+        hq.WriteErrorJSON(ExactSolution, output_dir);
+        hq.WriteExactSolutionJSON(ExactSolution, output_dir);
     }
 
     return EXIT_SUCCESS;

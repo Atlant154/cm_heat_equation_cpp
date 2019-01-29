@@ -9,7 +9,7 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
-class heat_equation {
+class HeatEquation {
 public:
     /*!
      * Constructor class of heat equation. Requires exact solutions for the entire surface.
@@ -19,7 +19,7 @@ public:
      * @param h_num - The number of spatial splits.
      * @param time_layers_num - The number of time layers.
     */
-    heat_equation(double_t (*heat_sources)(double_t, double_t),
+    HeatEquation(double_t (*heat_sources)(double_t, double_t),
                   double_t (*exact_solution)(double_t, double_t),
                   double_t diffusivity_coefficient,
                   uint32_t h_num,
@@ -35,7 +35,7 @@ public:
      * @param h_num - The number of spatial splits.
      * @param time_layers_num - The number of time layers.
     */
-    heat_equation(double_t (*heat_sources)(double_t, double_t),
+    HeatEquation(double_t (*heat_sources)(double_t, double_t),
                   double_t (*initial_time_layer)(double_t),
                   double_t (*left_bound)(double_t),
                   double_t (*right_bound)(double_t),
@@ -48,17 +48,17 @@ public:
      * @param exact_solution - The function of exact solution of PDE.
      * @return - The total error.
      */
-    double_t get_error(double_t (*exact_solution)(double_t, double_t)) const noexcept;
-    void write_exact_solution(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
-    void write_exact_solution_json(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
-    void write_error(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
-    void write_error_json(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
-    void write_result(std::filesystem::path const & path = ".") const;
-    void write_result_json(std::filesystem::path const & path = ".") const;
+    double_t GetError(double_t (*exact_solution)(double_t, double_t)) const noexcept;
+    void WriteExactSolution(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
+    void WriteExactSolutionJSON(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
+    void WriteError(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
+    void WriteErrorJSON(double_t (*exact_solution)(double_t, double_t), std::filesystem::path const & path = ".") const;
+    void WriteResult(std::filesystem::path const & path = ".") const;
+    void WriteResultJSON(std::filesystem::path const & path = ".") const;
 
 public:
-    heat_equation() = delete;
-    ~heat_equation() = default;
+    HeatEquation() = delete;
+    ~HeatEquation() = default;
 
 private:
     /*!
@@ -67,9 +67,9 @@ private:
      * @param free_part - F from Ax = F.
      * @param result - The result(x) vector.
      */
-    void modified_thomas_alg(std::vector<double_t> const & free_part, std::vector<double_t> & result) const noexcept;
-    std::ofstream method_write(std::filesystem::path const & path, std::string const & type) const;
-    json method_json(std::string const & type) const;
+    void ModifiedThomasAlg(std::vector<double_t> const & free_part, std::vector<double_t> & result) const noexcept;
+    std::ofstream GenerateOfstream(std::filesystem::path const & path, std::string const & type) const;
+    json GenerateJSON(std::string const & type) const;
 
 private:
     //Time and space boundaries + diffusivity coefficient(a):

@@ -1,4 +1,4 @@
-#include <heat_equation.hpp>
+#include <HeatEquation.hpp>
 #include "gtest/gtest.h"
 
 double_t constexpr diffusivity_coefficient{0.010417};
@@ -27,13 +27,13 @@ inline double_t RightBound(double_t const t) {
 }
 
 double_t HeatEquationApprErrorFromExact(uint32_t const h_num, uint32_t const tau_num){
-    heat_equation const heat_eq(HeatSources, ExactSolution, diffusivity_coefficient, h_num, tau_num);
-    return heat_eq.get_error(ExactSolution);
+    HeatEquation const heat_eq(HeatSources, ExactSolution, diffusivity_coefficient, h_num, tau_num);
+    return heat_eq.GetError(ExactSolution);
 }
 
 double_t HeatEquationApprErrorFromBounds(uint32_t const h_num, uint32_t const tau_num){
-    heat_equation const heat_eq(HeatSources, InitialTimeLayer, LeftBound, RightBound, diffusivity_coefficient, h_num, tau_num);
-    return heat_eq.get_error(ExactSolution);
+    HeatEquation const heat_eq(HeatSources, InitialTimeLayer, LeftBound, RightBound, diffusivity_coefficient, h_num, tau_num);
+    return heat_eq.GetError(ExactSolution);
 }
 
 double_t HeatEquationErrorCorrection(double_t const second_error, uint32_t const factor) {
@@ -42,10 +42,10 @@ double_t HeatEquationErrorCorrection(double_t const second_error, uint32_t const
 
 TEST(FromExactSolution, LargeMesh) {
     uint32_t const h_num{5}, tau_num{h_num * h_num}, factor{2};
-    double_t const first_error{HeatEquationApprErrorFromExact(h_num, tau_num)};
-    double_t const second_error{HeatEquationApprErrorFromExact(h_num * factor, tau_num * factor * factor)};
+    double_t const first_error  {HeatEquationApprErrorFromExact(h_num, tau_num)};
+    double_t const second_error {HeatEquationApprErrorFromExact(h_num * factor, tau_num * factor * factor)};
 
-    double_t corrected_error = HeatEquationErrorCorrection(second_error, factor);
+    double_t corrected_error {HeatEquationErrorCorrection(second_error, factor)};
 
     ASSERT_GE(first_error, corrected_error);
 }
@@ -55,7 +55,7 @@ TEST(FromExactSolution, FineMesh) {
     double_t const first_error  {HeatEquationApprErrorFromExact(h_num, tau_num)};
     double_t const second_error {HeatEquationApprErrorFromExact(h_num * factor, tau_num * factor * factor)};
 
-    double_t corrected_error = HeatEquationErrorCorrection(second_error, factor);
+    double_t corrected_error {HeatEquationErrorCorrection(second_error, factor)};
 
     ASSERT_GE(first_error, corrected_error);
 }
@@ -65,7 +65,7 @@ TEST(FromBoundConditions, LargeMesh) {
     double_t const first_error  {HeatEquationApprErrorFromBounds(h_num, tau_num)};
     double_t const second_error {HeatEquationApprErrorFromBounds(h_num * factor, tau_num * factor * factor)};
 
-    double_t corrected_error = HeatEquationErrorCorrection(second_error, factor);
+    double_t corrected_error {HeatEquationErrorCorrection(second_error, factor)};
 
     ASSERT_GE(first_error, corrected_error);
 }
@@ -75,7 +75,7 @@ TEST(FromBoundConditions, FineMesh) {
     double_t const first_error  {HeatEquationApprErrorFromBounds(h_num, tau_num)};
     double_t const second_error {HeatEquationApprErrorFromBounds(h_num * factor, tau_num * factor * factor)};
 
-    double_t corrected_error = HeatEquationErrorCorrection(second_error, factor);
+    double_t corrected_error {HeatEquationErrorCorrection(second_error, factor)};
 
     ASSERT_GE(first_error, corrected_error);
 }

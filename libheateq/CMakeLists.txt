@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 project(heat_equation DESCRIPTION "Numeric solution of heat equation ODE library.")
 
-add_library(heat_equation SHARED src/heat_equation.cpp)
+add_library(heat_equation SHARED src/HeatEquation.cpp)
 target_include_directories(heat_equation PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include/>
         PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)

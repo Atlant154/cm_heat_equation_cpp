@@ -14,7 +14,7 @@
 ## Requirements
 
 * [CMake](https://cmake.org/) v3.10 performance guaranteed.
-* [G++ compiler](https://gcc.gnu.org/) v7.3 performance guaranteed.
+* [G++ compiler](https://gcc.gnu.org/) v8.2 performance guaranteed.
 * [Python](https://www.python.org/) 3* with installed [matplotlib](https://matplotlib.org/) for visualization.
 
 ## How to start
@@ -56,7 +56,7 @@
 элементы верхней и нижней диагонали равны одному значению, потому для наиболее эффективного использования
 использовался видоизменённый алгоритм прогонки:  
 ```C++
-void heat_equation::modified_thomas_alg(std::vector<double_t> const & free_part, std::vector<double_t> & result) {
+void HeatEquation::ModifiedThomasAlg(std::vector<double_t> const & free_part, std::vector<double_t> & result) {
     std::size_t n = result.size();
     std::vector<double_t> alpha(n - 1), beta(n - 1);
 
