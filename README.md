@@ -9,7 +9,7 @@
 ## Problem
 
 Нужно было решить [PDE(уравнение в частных производных)](https://en.wikipedia.org/wiki/Partial_differential_equation) [heat equation(уравнения теплопроводности)](https://en.wikipedia.org/wiki/Heat_equation) исользуя [implicit Euler method(неявный метод Эйлера)](https://en.wikipedia.org/wiki/Backward_Euler_method).  
-Для решения была написана библиотека `libheateq`, а также приложение, которое позволяет её использовать. 
+Для решения была написана библиотека `heateq`, а также приложение, которое позволяет её использовать. 
 
 ## Requirements
 
@@ -37,14 +37,10 @@
 
 ## Visualization
 
-После выполнения программы с `write`-флагом, в указанной директории появится файлы `result.txt` и `error.txt`.
-`result.txt` - файл, содержащий значения, треюуемые для построения графика приближенного значения, значения хранятся как `[[x_left, x_right, x_num], [t_left, t_right, t_num], [[time_layer], ..., [time_layer]]]`.
-`error.txt` - файл, содержащий значения, требуемые для построения графика ошибки, значения хранятся аналогично `result.txt`.
-Для визуализации нужно поместить скрипт в папку с результатом вычислений и выполнить `python3 viz.py`.
+После выполнения программы с `write`-флагом, в указанной директории появится файлы требуемые для визуализации. Построить графики приближенного решения, ошибки и точного решения можно запустив
+скрипт `heateq/visualization/visualization.py` в директории с сохранёнными файлами: `python3 visualization.py` 
 
 ![Visualization](docs/vis.png)
-
-В `libheateq/visualization` содержатся скрипты для визуализации приближенного решения, ошибки и точного решения. Точное решение захардкожено и требует изменения в теле скрипта.
 
 ## Solution and hacks
 
@@ -56,8 +52,9 @@
 элементы верхней и нижней диагонали равны одному значению, потому для наиболее эффективного использования
 использовался видоизменённый алгоритм прогонки:  
 ```C++
-void HeatEquation::ModifiedThomasAlg(std::vector<double_t> const & free_part, std::vector<double_t> & result) {
-    std::size_t n = result.size();
+void HeatEquation::ModifiedThomasAlg(std::vector<double_t> const & free_part, std::vector<double_t> & result) const noexcept {
+    assert(free_part.size() == result.size());
+    std::size_t const n = free_part.size();
     std::vector<double_t> alpha(n - 1), beta(n - 1);
 
     double_t common_factor;
@@ -65,15 +62,15 @@ void HeatEquation::ModifiedThomasAlg(std::vector<double_t> const & free_part, st
     alpha[n - 2] = -matrix_above_ / matrix_main_;
     beta[n - 2] = free_part.back() / matrix_main_;
 
-    for (auto iter = n - 2; iter > 0; --iter) {
-        common_factor = 1.0 / (matrix_main_ + matrix_above_ * alpha[iter]);
+    for (auto iter {n - 2}; iter > 0; --iter) {
+        common_factor   = 1. / (matrix_main_ + matrix_above_ * alpha[iter]);
         alpha[iter - 1] = -matrix_above_ * common_factor;
-        beta[iter - 1] = (free_part[iter] - beta[iter] * matrix_above_) * common_factor;
+        beta[iter - 1]  = (free_part[iter] - beta[iter] * matrix_above_) * common_factor;
     }
 
     result[0] = (free_part[0] - matrix_above_ * beta[0]) / (matrix_main_ + matrix_above_ * alpha[0]);
 
-    for (std::size_t iter = 1; iter < n; ++iter)
+    for (std::size_t iter{1}; iter < n; ++iter)
         result[iter] = alpha[iter - 1] * result[iter - 1] + beta[iter - 1];
 }
 ```
@@ -90,10 +87,10 @@ void HeatEquation::ModifiedThomasAlg(std::vector<double_t> const & free_part, st
 
 |      Splits:      |     128    |     512    | 1'024      | 8'192      | 32'768    | 131'072   |
 |:-----------------:|:----------:|:----------:|------------|------------|-----------|-----------|
-| Cpp(unoptimized): | 604.942 μs | 2307.75 μs | 4226.58 μs | 34498.1 μs | 143869 μs | 579175 μs |
+| Cpp(unoptimized): | 361.917 μs | 1439.70 μs | 2897.31 μs | 23783.5 μs | 94867  μs | 386435 μs |
 
 Процессор: I7-6700.
 
 ## Calculation error
 
-Скорость аппроксимации: ![error](docs/error.png). Тесты скорости можно найти в `libheateq/tests`, для проведения тестирования был использован google-test.
+Скорость аппроксимации: ![error](docs/error.png). Тесты скорости можно найти в `heateq/tests`, для проведения тестирования был использован google-test.

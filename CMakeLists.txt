@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(sources main.cpp)
 add_executable(cm_heat_equation ${sources})
 
-add_subdirectory(libheateq)
+add_subdirectory(heateq)
 target_link_libraries(cm_heat_equation heat_equation)
 enable_testing()
 
