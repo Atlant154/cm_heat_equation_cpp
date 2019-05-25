@@ -6,7 +6,7 @@
 #include <fstream>
 #include <filesystem>
 
-#include <nlohmann/json.hpp>
+#include "../json/json.hpp"
 using json = nlohmann::json;
 
 class HeatEquation {

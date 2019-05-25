@@ -9,22 +9,16 @@ target_include_directories(heat_equation PUBLIC
         PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
 
 add_subdirectory(benchmark)
+include_directories(json)
 
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_subdirectory(json)
-target_link_libraries(heat_equation nlohmann_json::nlohmann_json)
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -Wall -Wextra -pedantic -g -Wshadow -Wformat=2 -Wconversion \
-        -Wlogical-op -Wshift-overflow=2 -Wduplicated-cond -Wcast-qual -Wcast-align -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC \
-        -D_FORTIFY_SOURCE=2 -fsanitize=undefined")
-
-    set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O2 -funroll-loops -ftree-vectorize")
-
-    target_link_libraries(heat_equation stdc++fs)
-
-endif ()
+target_compile_options(cm_heat_equation PRIVATE
+        $<$<CONFIG:DEBUG>: -Wall -Wextra -pedantic -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC>
+        $<$<CONFIG:RELEASE>: -DNDEBUG -O2 -funroll-loops -ftree-vectorize>)
+target_compile_options(cm_heat_equation PRIVATE $<$<CXX_COMPILER_ID:GNU>:
+        $<$<CONFIG:DEBUG>: -ggdb -Wformat=2 -Wconversion -Wlogical-op -Wshift-overflow=2 -Wduplicated-cond -Wcast-qual -Wcast-align>>)
+target_compile_options(cm_heat_equation PRIVATE $<$<CXX_COMPILER_ID:Clang>:
+        $<$<CONFIG:DEBUG>:-Weverything -Wno-c++98-compat-pedantic -Wno-missing-prototypes>>)
+target_link_libraries(heat_equation stdc++fs)
 
 option(PACKAGE_TESTS "Build the tests" ON)
 if (PACKAGE_TESTS)

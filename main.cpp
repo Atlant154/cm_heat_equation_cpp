@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <CLI/CLI.hpp>
+#include "CLI/CLI11.hpp"
 #include <HeatEquation.hpp>
 
 double_t constexpr diffusivity_coefficient{0.010417};
