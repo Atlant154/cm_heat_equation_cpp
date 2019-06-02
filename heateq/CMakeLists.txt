@@ -9,24 +9,12 @@ target_include_directories(heat_equation PUBLIC
         PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
 
 add_subdirectory(benchmark)
-include_directories(json)
 
 target_compile_options(cm_heat_equation PRIVATE
         $<$<CONFIG:DEBUG>: -Wall -Wextra -pedantic -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC>
-        $<$<CONFIG:RELEASE>: -DNDEBUG -O2 -funroll-loops -ftree-vectorize>)
+        $<$<CONFIG:RELEASE>: -DNDEBUG -march=native -O2 -funroll-loops -ftree-vectorize>)
 target_compile_options(cm_heat_equation PRIVATE $<$<CXX_COMPILER_ID:GNU>:
         $<$<CONFIG:DEBUG>: -ggdb -Wformat=2 -Wconversion -Wlogical-op -Wshift-overflow=2 -Wduplicated-cond -Wcast-qual -Wcast-align>>)
 target_compile_options(cm_heat_equation PRIVATE $<$<CXX_COMPILER_ID:Clang>:
         $<$<CONFIG:DEBUG>:-Weverything -Wno-c++98-compat-pedantic -Wno-missing-prototypes>>)
 target_link_libraries(heat_equation stdc++fs)
-
-option(PACKAGE_TESTS "Build the tests" ON)
-if (PACKAGE_TESTS)
-
-    if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
-    endif ()
-
-    enable_testing()
-    add_subdirectory(tests)
-endif ()

@@ -59,16 +59,16 @@ void HeatEquation::ModifiedThomasAlg(std::vector<double_t> const & free_part, st
 
     double_t common_factor;
 
-    alpha[n - 2] = -matrix_above_ / matrix_main_;
-    beta[n - 2] = free_part.back() / matrix_main_;
+    alpha[n - 2] = -m_matrixAboveDiagonalElement / m_matrixMainDiagonalElement;
+    beta[n - 2] = free_part.back() / m_matrixMainDiagonalElement;
 
     for (auto iter {n - 2}; iter > 0; --iter) {
-        common_factor   = 1. / (matrix_main_ + matrix_above_ * alpha[iter]);
-        alpha[iter - 1] = -matrix_above_ * common_factor;
-        beta[iter - 1]  = (free_part[iter] - beta[iter] * matrix_above_) * common_factor;
+        common_factor   = 1. / (m_matrixMainDiagonalElement + m_matrixAboveDiagonalElement * alpha[iter]);
+        alpha[iter - 1] = -m_matrixAboveDiagonalElement * common_factor;
+        beta[iter - 1]  = (free_part[iter] - beta[iter] * m_matrixAboveDiagonalElement) * common_factor;
     }
 
-    result[0] = (free_part[0] - matrix_above_ * beta[0]) / (matrix_main_ + matrix_above_ * alpha[0]);
+    result[0] = (free_part[0] - m_matrixAboveDiagonalElement * beta[0]) / (m_matrixMainDiagonalElement + m_matrixAboveDiagonalElement * alpha[0]);
 
     for (std::size_t iter{1}; iter < n; ++iter)
         result[iter] = alpha[iter - 1] * result[iter - 1] + beta[iter - 1];
