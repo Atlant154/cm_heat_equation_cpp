@@ -16,8 +16,8 @@ static void HeatEQ(benchmark::State &state) {
     };
 
     for (auto _ : state)
-        HeatEquation heq_eq(HeatSources, ExactSolution, diffusivityCoefficient, state.range(0), 100);
+        HeatEquation heq_eq(HeatSources, ExactSolution, diffusivityCoefficient, state.range(0), 100, 7);
 }
 
-BENCHMARK(HeatEQ)->RangeMultiplier(2)->Range(128, 1024<<7);
+BENCHMARK(HeatEQ)->RangeMultiplier(2)->Range(128, 1024<<10)->Iterations(20);
 BENCHMARK_MAIN();

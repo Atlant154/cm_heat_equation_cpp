@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package HEQSerialize;
+
+option optimize_for = SPEED;
+option cc_enable_arenas = true;
+
+message TimeLayer
+{
+    repeated double value = 1 [packed = true];
+}
+
+message Mesh
+{
+    enum Type {
+        EXACT_SOLUTION = 0;
+        APPROXIMATION = 1;
+    }
+
+    Type type = 1;
+    uint64 time_layers_num = 2;
+    uint64 spatial_splits_num = 3;
+
+    map< uint64, TimeLayer > mesh = 4;
+}

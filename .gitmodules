@@ -1,6 +1,3 @@
 [submodule "heateq/benchmark/google_benchmark"]
 	path = heateq/benchmark/google_benchmark
 	url = https://github.com/google/benchmark.git
-[submodule "heateq/tests/google_test"]
-	path = heateq/tests/google_test
-	url = https://github.com/google/googletest.git

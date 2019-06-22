@@ -25,6 +25,9 @@ int32_t main(int32_t argc, char * argv[]) {
     application.add_option("-o,--output-path", output_dir,
                            "The output directory path, i.e. ~/projects/visualization. Default: ./")->required(false);
 
+    std::size_t threadCount { 4 };
+    application.add_option( "-j,--jobs", threadCount, "Threads count [default = 4]" );
+
     CLI11_PARSE(application, argc, argv);
 
     std::function<double(double, double)> HeatSources = []( double X, double T ) -> double {
@@ -36,16 +39,14 @@ int32_t main(int32_t argc, char * argv[]) {
         return T * std::pow( X, 4.0 ) - std::pow( T, 2.0 ) * std::exp( X ) * ( X - 1.0 ) + 1.0;
     };
 
-    HeatEquation hq(HeatSources, ExactSolution, diffusivity_coefficient, h_num, tau_num);
+    HeatEquation hq(HeatSources, ExactSolution, diffusivity_coefficient, h_num, tau_num, threadCount);
 
     double_t const error = hq.GetError(ExactSolution);
     std::cout << "Error resulting from the calculation: " << error << "." << std::endl;
 
-//    if (write_to_file) {
-//        hq.WriteResultJSON(output_dir);
-//        hq.WriteErrorJSON(ExactSolution, output_dir);
-//        hq.WriteExactSolutionJSON(ExactSolution, output_dir);
-//    }
+    if (write_to_file) {
+        hq.WriteResult( output_dir );
+    }
 
     return EXIT_SUCCESS;
 }
